@@ -3,7 +3,7 @@
 // @name         电影网站过滤系统
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
-// @downloadURL  https://github.com/kingphoenix2000/tampermonkey_scripts
+// @downloadURL  https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/%E7%94%B5%E5%BD%B1%E7%BD%91%E7%AB%99%E8%BF%87%E6%BB%A4%E7%B3%BB%E7%BB%9F.user.js
 // @version      0.1.0
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  点击页面左下角蓝色按钮删除超链接中的第三方跳转，目前支持的网站有知乎、简书、掘金等等网站。如果发现没有删除第三方跳转，或者新的超链接是新生成的，多次点击该按钮即可。
