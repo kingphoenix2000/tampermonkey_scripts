@@ -6,7 +6,7 @@
 // @downloadURL  https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/%E7%94%B5%E5%BD%B1%E7%BD%91%E7%AB%99%E8%BF%87%E6%BB%A4%E7%B3%BB%E7%BB%9F.user.js
 // @version      0.1.0
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
-// @description  在悠悠MP4电影网站的文字电影列表顶部添加几个可以筛选的关键字按钮，点击相应的按钮就会按照按钮的提示文字进行电影种类的筛选，并切换下面列表的显示。
+// @description  在悠悠MP4电影网站的文字电影列表顶部添加几个可以筛选的关键字按钮，点击相应的按钮就会按照按钮的提示文字进行电影种类的筛选，并切换下面列表的显示。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @homepage     https://blog.csdn.net/kingwolf_javascript/
 // @include      https://www.uump4.net/*
 // @grant        none
