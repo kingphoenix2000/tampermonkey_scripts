@@ -53,7 +53,7 @@
                 a.style.border = "none";
             });
         }, false);
-        js_content.parentNode.insertBefore(input, js_content.firstChild);
+        js_content.insertBefore(input, js_content.firstChild);
     }, 1000);
     // Your code here...
 })();
