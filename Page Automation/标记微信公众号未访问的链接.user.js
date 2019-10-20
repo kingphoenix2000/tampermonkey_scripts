@@ -4,7 +4,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @downloadURL  https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Page%20Automation/%E6%A0%87%E8%AE%B0%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7%E6%9C%AA%E8%AE%BF%E9%97%AE%E7%9A%84%E9%93%BE%E6%8E%A5.user.js
-// @version      0.1.0
+// @version      0.1.1
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  在微信公众号页面，标题处显示出当前页面一共有多少链接，其中你访问过的链接有多少，然后给页面中没有访问过的链接加一个红色边框。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @homepage     https://blog.csdn.net/kingwolf_javascript/
