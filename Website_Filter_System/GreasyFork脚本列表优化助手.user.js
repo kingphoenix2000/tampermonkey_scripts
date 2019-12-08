@@ -22,6 +22,47 @@
             if (elem) { elem.remove(); }
         });
     }
+    function addFilterSystem() {
+        let div = document.createElement("div");
+        let h2 = document.createElement("h2");
+        h2.innerText = "GreasyFork脚本列表优化助手";
+        div.appendChild(h2);
+        let input = document.createElement("input");
+        input.id = "filter_input";
+        input.type = "text";
+        input.value = "";
+        input.placeholder = "请输入过滤关键字";
+        div.appendChild(input);
+        let showOnlyBtn = document.createElement("input");
+        let items = document.querySelectorAll("#browse-script-list > li");
+        let len = items.length;
+        showOnlyBtn.type = "button";
+        showOnlyBtn.value = "过滤脚本";
+        showOnlyBtn.style.marginLeft = "15px";
+        showOnlyBtn.onclick = function () {
+            let text = input.value;
+            for (let i = 0; i < len; i++) {
+                items[i].style.display = "none";
+                if (items[i].innerText.includes(text)) {
+                    items[i].style.display = "list-item";
+                }
+            }
+        }
+        let showAllBtn = document.createElement("input");
+        showAllBtn.type = "button";
+        showAllBtn.value = "显示全部脚本";
+        showAllBtn.style.marginLeft = "15px";
+        showAllBtn.onclick = function () {
+            for (let i = 0; i < len; i++) {
+                items[i].style.display = "list-item";
+            }
+        }
+        div.appendChild(showOnlyBtn);
+        div.appendChild(showAllBtn);
+        document.querySelector("#browse-script-list").insertBefore(div, document.querySelector("#browse-script-list").firstChild);
+    }
+
+    addFilterSystem();
 
     let items = document.querySelectorAll("#browse-script-list > li");
     let len = items.length;
