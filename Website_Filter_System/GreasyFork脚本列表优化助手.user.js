@@ -3,13 +3,16 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @downloadURL  https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.1.1
+// @version      0.1.2
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面每个脚本的下面添加几个快捷操作的按钮。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @homepage     https://blog.csdn.net/kingwolf_javascript/
 // @include      https://greasyfork.org/*
 // @grant        GM_xmlhttpRequest
 // @connect      greasyfork.org
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @note         2019-12-12 为脚本列表的每个脚本增加加入黑名单功能，加入黑名单的脚本会在页面加载完成以后被隐藏掉。可以单击显示全部脚本按钮来显示黑名单的脚本
 // ==/UserScript==
 
 
@@ -42,9 +45,8 @@
         showOnlyBtn.onclick = function () {
             let text = input.value;
             for (let i = 0; i < len; i++) {
-                items[i].style.display = "none";
-                if (items[i].innerText.includes(text)) {
-                    items[i].style.display = "list-item";
+                if (!items[i].innerText.includes(text)) {
+                    items[i].style.display = "none";//隐藏掉不包含关键字的脚本 并且对隐藏掉的包含关键字的脚本不做处理。
                 }
             }
         }
@@ -78,8 +80,15 @@
     }
 
 
+
+    let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
     var links = document.querySelectorAll("#browse-script-list > li > article > h2 > a");
-    links = Array.from(links);
+    for (let index = 0; index < links.length; index++) {
+        const node_li = links[index].parentNode.parentNode.parentNode;
+        if (arr.includes(node_li.dataset.scriptId)) {
+            node_li.style.display = "none";//隐藏掉黑名单里的脚本
+        }
+    }
     links.forEach(function (item) {
         var href = item.href;
         GM_xmlhttpRequest({
@@ -95,15 +104,37 @@
                 let a2 = document.createElement('a');
                 a2.href = "javascript:void(0);";
                 a2.innerText = "删除脚本";
-                a2.onclick = function () { item.parentNode.parentNode.parentNode.remove(); }
+                let node_li = item.parentNode.parentNode.parentNode;
+                a2.onclick = function () { node_li.remove(); }
                 a2.style.marginLeft = "15px";
                 let a3 = document.createElement('a');
-                a3.href = "https://greasyfork.org/zh-CN/users/289205-%E6%B5%B4%E7%81%AB%E5%87%A4%E5%87%B0";
-                a3.innerText = "浴火凤凰的其它脚本";
+                a3.href = "javascript:void(0);";
+                a3.innerText = "加入黑名单";
+                let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
+                if (arr.includes(node_li.dataset.scriptId)) { a3.innerText = "移除黑名单"; }
+                a3.onclick = function () {
+                    let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
+                    if (arr.includes(node_li.dataset.scriptId)) {
+                        arr.splice(arr.indexOf(node_li.dataset.scriptId), 1);
+                        GM_setValue("scriptIds_Blacklists", JSON.stringify(arr));
+                        this.innerText = "加入黑名单";
+                    }
+                    else {
+                        arr.push(node_li.dataset.scriptId);
+                        GM_setValue("scriptIds_Blacklists", JSON.stringify(arr));
+                        node_li.style.display = "none";
+                        this.innerText = "移除黑名单";
+                    }
+                }
                 a3.style.marginLeft = "15px";
+                let a4 = document.createElement('a');
+                a4.href = "https://greasyfork.org/zh-CN/users/289205-%E6%B5%B4%E7%81%AB%E5%87%A4%E5%87%B0";
+                a4.innerText = "浴火凤凰的其它脚本";
+                a4.style.marginLeft = "15px";
                 item.parentNode.appendChild(a);
                 item.parentNode.appendChild(a2);
                 item.parentNode.appendChild(a3);
+                item.parentNode.appendChild(a4);
             },
             onerror: function (response) {
                 console.error("查询信息发生错误。");
