@@ -65,7 +65,7 @@
         document.querySelector("#browse-script-list").insertBefore(div, document.querySelector("#browse-script-list").firstChild);
     }
 
-    addFilterSystem();
+    if (location.href.includes("/scripts")) { addFilterSystem(); }
 
     let items = document.querySelectorAll("#browse-script-list > li");
     let len = items.length;
