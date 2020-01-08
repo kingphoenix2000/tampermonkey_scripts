@@ -13,6 +13,7 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @note         2019-12-12 为脚本列表的每个脚本增加加入黑名单功能，加入黑名单的脚本会在页面加载完成以后被隐藏掉。可以单击显示全部脚本按钮来显示黑名单的脚本
+// @note         2020-01-08 在用户主页用户名的后面增加当前用户开发的脚本安装总数
 // ==/UserScript==
 
 
@@ -144,5 +145,16 @@
             }
         });
     });
+
+    if (location.href.includes("/users/")) {
+        let items = document.querySelectorAll("#user-script-list article > dl > dd.script-list-total-installs > span");
+        let sum = 0;
+        for (let i = 0; i < items.length; i++) {
+            let n = parseInt(items[i].innerText, 10);
+            if (!isNaN(n)) { sum += n; }
+        }
+        let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
+        document.querySelector("body > div.width-constraint > section > h2").innerText = text + `(${sum})`;
+    }
     // Your code here...
 })();
