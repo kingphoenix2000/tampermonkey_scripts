@@ -4,7 +4,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @downloadURL  https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Page%20Automation/%E5%88%A0%E9%99%A4%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E5%90%91.user.js
-// @version      0.1.0
+// @version      0.1.1
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  点击页面左下角蓝色按钮删除超链接中的第三方跳转，目前支持的网站有知乎、简书、掘金等等网站。如果发现没有删除第三方跳转，或者新的超链接是新生成的，多次点击该按钮即可。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @homepage     https://blog.csdn.net/kingwolf_javascript/
@@ -12,6 +12,7 @@
 // @include      *://*.jianshu.com/*
 // @include      *://juejin.im/*
 // @grant        none
+// @note         2020-01-09更新简书的跳转链接数据
 // ==/UserScript==
 
 (function () {
@@ -21,6 +22,7 @@
         "https://link.zhihu.com/?target=",
         "http://link.zhihu.com/?target=",
         "https://link.jianshu.com/?t=",
+        "https://links.jianshu.com/go?to=",
         "https://link.juejin.im/?target="
     ];
 
