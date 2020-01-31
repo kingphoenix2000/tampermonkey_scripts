@@ -19,14 +19,13 @@
         let items = document.querySelectorAll("ul.list-unstyled.threadlist > li.media.forum-list");
         let len = items.length;
         for (let i = 0; i < len; i++) {
-            items[i].addEventListener("click", function (e) {
-                if (e.ctrlKey === true) {
-                    e.preventDefault();
-                    this.remove();
-                    return false;
-                }
-                return true;
-            }, true);
+            let a = document.createElement("a");
+            a.innerText = "【删除】";
+            a.href = "javascript:void(0);";
+            a.onclick = function () {
+                this.parentNode.parentNode.remove();
+            }
+            items[i].querySelector("div.subject.break-all").appendChild(a);
         }
 
         var container = document.querySelector("div.threadlist-box > div.item-head > div.left");
