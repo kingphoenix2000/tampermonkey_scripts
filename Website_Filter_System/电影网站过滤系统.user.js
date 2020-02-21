@@ -32,12 +32,12 @@
 
         var container = document.querySelector(param.filterContainerSelector);
         var div = document.createElement("div");
-        var tagArr = ["显示全部", "字幕组", "合集", "BD", "HD", "WEB-DL", "720P", "1080P", "大区版", "4K", "原盘", "Remux", "3D", "多音轨", "中英双字", "中文字幕", "枪版", "删除当前显示项"];
+        var tagArr = ["显示全部", "字幕组", "合集", "BD", "WEB-DL", "HD", "720P", "1080P", "HDTV", "多音轨", "中英双字", "中文字幕", "大区版", "4K", "原盘", "Remux", "3D", "枪版", "删除当前显示项"];
         for (let i = 0; i < tagArr.length; i++) {
             let a = document.createElement("a");
             a.innerText = tagArr[i];
             a.href = "javascript:void(0);";
-            a.style.marginLeft = "10px";
+            a.style.marginLeft = "25px";
             a.onclick = function () {
                 let links = this.parentNode.querySelectorAll("a");
                 for (let i = 0; i < links.length; i++) {
@@ -114,9 +114,8 @@
                             }
                             break;
                         case "HD":
-                            if (!text1.includes("[hd")
+                            if (!text1.includes("[hd-")
                                 && !text1.includes("hdrip")
-                                && !text1.includes("hdtv")
                             ) {
                                 li.style.display = "none";
                             }
@@ -180,8 +179,10 @@
                                 && !text1.includes(".tc.")
                                 && !text1.includes("[ts")
                                 && !text1.includes(".ts.")
-                                && !text1.includes("[dvd")
-                                && !text1.includes("dvd")
+                                && !text1.includes("[dvd-")
+                                && !text1.includes("[dvd.")
+                                && !text1.includes("[dvdscr-")
+                                && !text1.includes("[dvdscr.")
                                 && !text1.includes("[cam")
                                 && !text1.includes(".cam.")
                                 && !text1.includes("tc中字")
