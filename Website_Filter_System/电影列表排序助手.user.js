@@ -268,6 +268,37 @@
             }
             document.querySelector("#movie-rel-list").innerHTML = div.innerHTML;
         }
+        let input5 = document.createElement("input");
+        input5.type = "button";
+        input5.value = "相似度";
+        input5.style.marginLeft = "15px";
+        input5.onclick = function () {
+            let items = document.querySelectorAll("#movie-rel-list > div.item");
+            let len = items.length;
+            let arr = [];
+            for (let i = 0; i < len; i++) {
+                arr.push(items[i]);
+            }
+            let _this = this;
+            arr.sort(function (a, b) {
+                let name1 = a.querySelector("div.is-row.clearfix div.row div.smt span[title=rating]");
+                let rating1 = name1.innerText.replace("%", "");
+                if (rating1) { rating1 = +rating1 }
+                else { rating1 = 0; }
+                let name2 = b.querySelector("div.is-row.clearfix div.row div.smt span[title=rating]");
+                let rating2 = name2.innerText.replace("%", "");
+                if (rating2) { rating2 = +rating2 }
+                else { rating2 = 0; }
+                if (_this.value == "相似度") { return rating2 - rating1; }
+                else { return rating1 - rating2; }
+
+            });
+            let div = document.createElement("div");
+            for (let i = 0; i < len; i++) {
+                div.appendChild(arr[i]);
+            }
+            document.querySelector("#movie-rel-list").innerHTML = div.innerHTML;
+        }
 
         div.appendChild(h4);
         div.appendChild(h5);
@@ -276,6 +307,7 @@
         div.appendChild(input2);
         div.appendChild(input3);
         div.appendChild(input4);
+        div.appendChild(input5);
         document.querySelector("#movie-rel-list").parentNode.insertBefore(div, document.querySelector("#movie-rel-list"));
 
     }
