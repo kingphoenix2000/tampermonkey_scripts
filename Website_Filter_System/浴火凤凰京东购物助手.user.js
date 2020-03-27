@@ -146,7 +146,7 @@
             input1.style.width = "200px";
             var button1 = document.createElement("input");
             button1.type = "button";
-            button1.value = "显示包含所有关键字的内容";
+            button1.value = "显示同时包含所有关键字的内容";
             button1.onclick = function () {
                 let values = input1.value.split(/\s+/);
                 let len = values.length;
@@ -293,7 +293,7 @@
 
 
 
-    if (location.href.includes("https://search.jd.com/Search?keyword=")) {
+    if (location.href.toLowerCase().includes("https://search.jd.com/search?keyword=")) {
         var div = document.createElement("div");
         div.id = "ecommerce_filter_wrapper";
         var ecommerce_filter = document.createElement("div");
