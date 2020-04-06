@@ -14,6 +14,7 @@
 // @grant        GM_setValue
 // @note         2019-12-12 为脚本列表的每个脚本增加加入黑名单功能，加入黑名单的脚本会在页面加载完成以后被隐藏掉。可以单击显示全部脚本按钮来显示黑名单的脚本
 // @note         2020-01-08 在用户主页用户名的后面增加当前用户开发的脚本安装总数
+// @note         2020-04-07 修复某些脚本名称带有引号导致解析错误的问题
 // ==/UserScript==
 
 
@@ -65,7 +66,7 @@
         document.querySelector("#browse-script-list").insertBefore(div, document.querySelector("#browse-script-list").firstChild);
     }
 
-    if (location.href.includes("/scripts")) { addFilterSystem(); }
+    if (document.querySelector("#browse-script-list")) { addFilterSystem(); }
 
     let items = document.querySelectorAll("#browse-script-list > li");
     let len = items.length;
@@ -98,6 +99,11 @@
             "onload": function (response) {
                 var text = response.responseText;
                 var scriptURL = text.match(/\/scripts\/[^"']+\.(user\.js)/)[0];
+                scriptURL = scriptURL.replace(/&#34;/g, '"').replace(/&quot;/g, '"');
+                scriptURL = scriptURL.replace(/&#39;/g, "'").replace(/&apos;/g, "'");
+                scriptURL = scriptURL.replace(/&#38;/g, "&").replace(/&amp;/g, "&");
+                scriptURL = scriptURL.replace(/&#60;/g, "<").replace(/&lt;/g, "<");
+                scriptURL = scriptURL.replace(/&#62;/g, ">").replace(/&gt;/g, ">");
                 console.log(scriptURL);
                 let a = document.createElement('a');
                 a.href = "https://greasyfork.org" + scriptURL;
