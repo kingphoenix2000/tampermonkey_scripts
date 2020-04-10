@@ -1,13 +1,17 @@
 // ==UserScript==
-// @name         GreasyFork脚本列表优化助手
+// @name         GreasyFork网站助手
+// @name:en      GreasyFork Website Assistant
+// @name:zh-CN   GreasyFork网站助手
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @downloadURL  https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.1.4
+// @version      0.1.5
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
-// @description  此脚本会在GreasyFork网站的脚本列表页面每个脚本的下面添加几个快捷操作的按钮。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
+// @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
+// @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
+// @description:en  This script will add several shortcut buttons under each script on the script list page and user script list page of GreasyFork website. Including functions such as direct installation, temporary deletion, blacklisting, etc. Added a function to filter scripts based on keywords at the top of the script list.Author：浴火凤凰(QQ:307053741,QQ group:194885662)
 // @homepage     https://blog.csdn.net/kingwolf_javascript/
-// @include      https://greasyfork.org/*
+// @include      https://*greasyfork.org/*
 // @grant        GM_xmlhttpRequest
 // @connect      greasyfork.org
 // @grant        GM_getValue
@@ -15,6 +19,7 @@
 // @note         2019-12-12 为脚本列表的每个脚本增加加入黑名单功能，加入黑名单的脚本会在页面加载完成以后被隐藏掉。可以单击显示全部脚本按钮来显示黑名单的脚本
 // @note         2020-01-08 在用户主页用户名的后面增加当前用户开发的脚本安装总数
 // @note         2020-04-07 修复某些脚本名称带有引号导致解析错误的问题
+// @note         2020-04-10 脚本架构重写。支持中英文界面。
 // ==/UserScript==
 
 
@@ -27,34 +32,76 @@
             if (elem) { elem.remove(); }
         });
     }
-    function addFilterSystem() {
+
+    function addSingleLink(container, text, href) {
+        let span = document.createElement('span');
+        let a = document.createElement('a');
+        a.href = href;
+        a.innerText = text;
+        span.appendChild(a);
+        container.appendChild(span);
+    }
+
+    let GUI_strs = {};
+    let is_CN = location.href.includes("zh-");
+    if (is_CN) {
+        GUI_strs = {
+            name: "GreasyFork网站助手",
+            filter_input_placeholder: "请输入过滤关键字",
+            showOnlyBtnValue: "过滤脚本",
+            showAllBtnValue: "显示全部脚本",
+            install: "安装脚本",
+            remove: "删除脚本",
+            addtoblacklist: "加入黑名单",
+            removefromblacklist: "移除黑名单",
+            authorotherscripts: "浴火凤凰的其它脚本",
+        };
+    }
+    else {
+        GUI_strs = {
+            name: "GreasyFork Website Assistant",
+            filter_input_placeholder: "Please enter filter keywords here...",
+            showOnlyBtnValue: "Filter script",
+            showAllBtnValue: "Show all scripts",
+            install: "install",
+            remove: "remove",
+            addtoblacklist: "add to blacklist",
+            removefromblacklist: "remove from blacklist",
+            authorotherscripts: "Author's other scripts",
+        };
+    }
+
+    function addFilterSystem(selector) {
         let div = document.createElement("div");
         let h2 = document.createElement("h2");
-        h2.innerText = "GreasyFork脚本列表优化助手";
+        h2.style.cssText = "margin: 10px;color: #A42121;";
+        h2.innerText = GUI_strs.name;
         div.appendChild(h2);
         let input = document.createElement("input");
         input.id = "filter_input";
         input.type = "text";
         input.value = "";
-        input.placeholder = "请输入过滤关键字";
+        input.style.cssText = "margin: 10px;width: 300px;";
+        input.placeholder = GUI_strs.filter_input_placeholder;
         div.appendChild(input);
         let showOnlyBtn = document.createElement("input");
-        let items = document.querySelectorAll("#browse-script-list > li");
+        let items = document.querySelectorAll(selector + " > li");
         let len = items.length;
         showOnlyBtn.type = "button";
-        showOnlyBtn.value = "过滤脚本";
+        showOnlyBtn.value = GUI_strs.showOnlyBtnValue;
         showOnlyBtn.style.marginLeft = "15px";
         showOnlyBtn.onclick = function () {
-            let text = input.value;
+            let text = input.value.trim().toLowerCase();
             for (let i = 0; i < len; i++) {
-                if (!items[i].innerText.includes(text)) {
+                let text1 = items[i].innerText.trim().toLowerCase();
+                if (!text1.includes(text)) {
                     items[i].style.display = "none";//隐藏掉不包含关键字的脚本 并且对隐藏掉的包含关键字的脚本不做处理。
                 }
             }
         }
         let showAllBtn = document.createElement("input");
         showAllBtn.type = "button";
-        showAllBtn.value = "显示全部脚本";
+        showAllBtn.value = GUI_strs.showAllBtnValue;
         showAllBtn.style.marginLeft = "15px";
         showAllBtn.onclick = function () {
             for (let i = 0; i < len; i++) {
@@ -63,96 +110,78 @@
         }
         div.appendChild(showOnlyBtn);
         div.appendChild(showAllBtn);
-        document.querySelector("#browse-script-list").insertBefore(div, document.querySelector("#browse-script-list").firstChild);
+        document.querySelector(selector).insertBefore(div, document.querySelector(selector).firstChild);
     }
 
-    if (document.querySelector("#browse-script-list")) { addFilterSystem(); }
 
-    let items = document.querySelectorAll("#browse-script-list > li");
-    let len = items.length;
-    for (let i = 0; i < len; i++) {
-        items[i].addEventListener("click", function (e) {
-            if (e.ctrlKey === true) {
-                e.preventDefault();
-                this.remove();
-                return false;
+    function hideScriptsInBlacklist(selector) {
+        let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
+        let node_lis = document.querySelectorAll(selector + " > li");
+        let len = node_lis.length;
+        for (let i = 0; i < len; i++) {
+            let li = node_lis[i];
+            if (!li.querySelector("article > h2 > a")) { continue; }
+            let scriptId = li.dataset.scriptId;
+            if (scriptId && arr.includes(scriptId)) {
+                li.style.display = "none";//隐藏掉黑名单里的脚本
             }
-            return true;
-        }, true);
-    }
-
-
-
-    let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
-    var links = document.querySelectorAll("#browse-script-list > li > article > h2 > a");
-    for (let index = 0; index < links.length; index++) {
-        const node_li = links[index].parentNode.parentNode.parentNode;
-        if (arr.includes(node_li.dataset.scriptId)) {
-            node_li.style.display = "none";//隐藏掉黑名单里的脚本
         }
     }
-    links.forEach(function (item) {
-        var href = item.href;
-        GM_xmlhttpRequest({
-            "method": "GET",
-            "url": href,
-            "onload": function (response) {
-                var text = response.responseText;
-                var scriptURL = text.match(/\/scripts\/[^"']+\.(user\.js)/)[0];
-                scriptURL = scriptURL.replace(/&#34;/g, '"').replace(/&quot;/g, '"');
-                scriptURL = scriptURL.replace(/&#39;/g, "'").replace(/&apos;/g, "'");
-                scriptURL = scriptURL.replace(/&#38;/g, "&").replace(/&amp;/g, "&");
-                scriptURL = scriptURL.replace(/&#60;/g, "<").replace(/&lt;/g, "<");
-                scriptURL = scriptURL.replace(/&#62;/g, ">").replace(/&gt;/g, ">");
-                console.log(scriptURL);
-                let a = document.createElement('a');
-                a.href = "https://greasyfork.org" + scriptURL;
-                a.innerText = "安装脚本";
-                let a2 = document.createElement('a');
-                a2.href = "javascript:void(0);";
-                a2.innerText = "删除脚本";
-                let node_li = item.parentNode.parentNode.parentNode;
-                a2.onclick = function () { node_li.remove(); }
-                a2.style.marginLeft = "15px";
-                let a3 = document.createElement('a');
-                a3.href = "javascript:void(0);";
-                a3.innerText = "加入黑名单";
-                let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
-                if (arr.includes(node_li.dataset.scriptId)) { a3.innerText = "移除黑名单"; }
-                a3.onclick = function () {
-                    let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
-                    if (arr.includes(node_li.dataset.scriptId)) {
-                        arr.splice(arr.indexOf(node_li.dataset.scriptId), 1);
-                        GM_setValue("scriptIds_Blacklists", JSON.stringify(arr));
-                        this.innerText = "加入黑名单";
-                    }
-                    else {
-                        arr.push(node_li.dataset.scriptId);
-                        GM_setValue("scriptIds_Blacklists", JSON.stringify(arr));
-                        node_li.style.display = "none";
-                        this.innerText = "移除黑名单";
-                    }
-                }
-                a3.style.marginLeft = "15px";
-                let a4 = document.createElement('a');
-                a4.href = "https://greasyfork.org/zh-CN/users/289205-%E6%B5%B4%E7%81%AB%E5%87%A4%E5%87%B0";
-                a4.innerText = "浴火凤凰的其它脚本";
-                a4.style.marginLeft = "15px";
-                item.parentNode.appendChild(a);
-                item.parentNode.appendChild(a2);
-                item.parentNode.appendChild(a3);
-                item.parentNode.appendChild(a4);
-            },
-            onerror: function (response) {
-                console.error("查询信息发生错误。");
-            },
-            ontimeout: function (response) {
-                console.info("查询信息超时。");
-            }
-        });
-    });
+    function addLinks(selector) {
+        let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
+        let node_lis = document.querySelectorAll(selector);
+        let len = node_lis.length;
+        for (let i = 0; i < len; i++) {
+            let li = node_lis[i];
+            let p = document.createElement("p");
 
-    if (location.href.includes("/users/")) {
+            if (!li.querySelector("article > h2 > a")) { continue; }
+            let a1 = document.createElement('a');
+            a1.href = li.querySelector("article > h2 > a").href + "/code.user.js";
+            a1.innerText = GUI_strs.install;
+            p.appendChild(a1);
+            p.appendChild(document.createTextNode(" | "));
+
+            let a2 = document.createElement('a');
+            a2.href = "javascript:void(0);";
+            a2.innerText = GUI_strs.remove;
+            a2.onclick = function () { li.remove(); }
+            p.appendChild(a2);
+            p.appendChild(document.createTextNode(" | "));
+
+            let a3 = document.createElement('a');
+            a3.href = "javascript:void(0);";
+            a3.innerText = GUI_strs.addtoblacklist;
+            let scriptId = li.dataset.scriptId;
+            if (scriptId && arr.includes(scriptId)) { a3.innerText = GUI_strs.removefromblacklist; }
+            a3.onclick = function () {
+                let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
+                if (arr.includes(scriptId)) {
+                    arr.splice(arr.indexOf(scriptId), 1);
+                    GM_setValue("scriptIds_Blacklists", JSON.stringify(arr));
+                    this.innerText = GUI_strs.addtoblacklist;
+                }
+                else {
+                    arr.push(scriptId);
+                    GM_setValue("scriptIds_Blacklists", JSON.stringify(arr));
+                    li.style.display = "none";
+                    this.innerText = GUI_strs.removefromblacklist;
+                }
+            }
+            p.appendChild(a3);
+            p.appendChild(document.createTextNode(" | "));
+
+            let a4 = document.createElement('a');
+            a4.href = "https://greasyfork.org/zh-CN/users/289205-%E6%B5%B4%E7%81%AB%E5%87%A4%E5%87%B0";
+            a4.innerText = GUI_strs.authorotherscripts;
+            a4.target = "_blank";
+            p.appendChild(a4);
+            p.appendChild(document.createTextNode(" | "));
+            li.querySelector("article").appendChild(p);
+        }
+    }
+
+    function total_installs() {
         let items = document.querySelectorAll("#user-script-list article > dl > dd.script-list-total-installs > span");
         let sum = 0;
         for (let i = 0; i < items.length; i++) {
@@ -162,5 +191,18 @@
         let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
         document.querySelector("body > div.width-constraint > section > h2").innerText = text + `(${sum})`;
     }
+
+    if (document.querySelector("#browse-script-list")) {
+        addFilterSystem("#browse-script-list");
+        hideScriptsInBlacklist("#browse-script-list");
+        addLinks("#browse-script-list > li");
+    }
+    if (document.querySelector("#user-script-list")) {
+        total_installs();
+        addFilterSystem("#user-script-list");
+        hideScriptsInBlacklist("#user-script-list");
+        addLinks("#user-script-list > li");
+    }
+
     // Your code here...
 })();
