@@ -1,6 +1,7 @@
 
 // ==UserScript==
 // @name                  Website helper
+// @name:en               Website helper
 // @name:zh-CN            网站好帮手
 // @namespace             https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL            https://github.com/kingphoenix2000/tampermonkey_scripts
@@ -8,6 +9,7 @@
 // @version               0.1.2
 // @author                浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description           This script provides a series of small tools to speed up the speed of your visit to the website and improve your work efficiency.
+// @description:en        This script provides a series of small tools to speed up the speed of your visit to the website and improve your work efficiency.
 // @description:zh-CN     本脚本提供了一系列小工具，在您访问互联网网站的时候加快您访问网站的速度和提高您的工作效率。
 // @homepage              https://blog.csdn.net/kingwolf_javascript/
 // @include               *
