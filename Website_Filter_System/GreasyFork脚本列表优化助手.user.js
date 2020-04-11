@@ -4,7 +4,7 @@
 // @name:zh-CN   GreasyFork网站助手
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
-// @downloadURL  https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
+// @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
 // @version      0.1.5
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -191,6 +191,31 @@
         let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
         document.querySelector("body > div.width-constraint > section > h2").innerText = text + `(${sum})`;
     }
+    function handle_blacklist() {
+        let installArea = document.querySelector("#install-area");
+        if (!installArea) { return; }
+        let a3 = document.createElement('a');
+        a3.href = "javascript:void(0);";
+        a3.innerText = GUI_strs.addtoblacklist;
+        let scriptId = location.href.match(/\/scripts\/(\d+)-/);
+        if (scriptId) { scriptId = scriptId[1]; }
+        let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
+        if (scriptId && arr.includes(scriptId)) { a3.innerText = GUI_strs.removefromblacklist; }
+        a3.onclick = function () {
+            let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
+            if (arr.includes(scriptId)) {
+                arr.splice(arr.indexOf(scriptId), 1);
+                GM_setValue("scriptIds_Blacklists", JSON.stringify(arr));
+                this.innerText = GUI_strs.addtoblacklist;
+            }
+            else {
+                arr.push(scriptId);
+                GM_setValue("scriptIds_Blacklists", JSON.stringify(arr));
+                this.innerText = GUI_strs.removefromblacklist;
+            }
+        }
+        installArea.appendChild(a3);
+    }
 
     if (document.querySelector("#browse-script-list")) {
         addFilterSystem("#browse-script-list");
@@ -203,6 +228,10 @@
         hideScriptsInBlacklist("#user-script-list");
         addLinks("#user-script-list > li");
     }
+    if (/\/scripts\/\d+-/.test(location.href)) {
+        handle_blacklist();
+    }
+
 
     // Your code here...
 })();
