@@ -1,43 +1,104 @@
 
 // ==UserScript==
-// @name         删除链接重定向
-// @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
-// @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
-// @downloadURL  https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Page%20Automation/%E5%88%A0%E9%99%A4%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E5%90%91.user.js
-// @version      0.1.1
-// @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
-// @description  点击页面左下角蓝色按钮删除超链接中的第三方跳转，目前支持的网站有知乎、简书、掘金等等网站。如果发现没有删除第三方跳转，或者新的超链接是新生成的，多次点击该按钮即可。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
-// @homepage     https://blog.csdn.net/kingwolf_javascript/
-// @include      *://*.zhihu.com/*
-// @include      *://*.jianshu.com/*
-// @include      *://juejin.im/*
-// @grant        none
-// @note         2020-01-09更新简书的跳转链接数据
+// @name                  Website helper
+// @name:zh-CN            网站好帮手
+// @namespace             https://github.com/kingphoenix2000/tampermonkey_scripts
+// @supportURL            https://github.com/kingphoenix2000/tampermonkey_scripts
+// @updateURL             https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Page%20Automation/%E5%88%A0%E9%99%A4%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E5%90%91.user.js
+// @version               0.1.2
+// @author                浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
+// @description           This script provides a series of small tools to speed up the speed of your visit to the website and improve your work efficiency.
+// @description:zh-CN     本脚本提供了一系列小工具，在您访问互联网网站的时候加快您访问网站的速度和提高您的工作效率。
+// @homepage              https://blog.csdn.net/kingwolf_javascript/
+// @include               *
+// @grant                 GM_getValue
+// @grant                 GM_setValue
+// @noframes
+// @note                  2020-04-10：添加删除服务器跳转功能。
 // ==/UserScript==
 
 (function () {
     'use strict';
+    function getDomainName(str1) {
+        let hostname = str1 || window.location.hostname;
+        if (hostname.endsWith(".cn")) {//如果以.cn结尾，则取后三位
+            hostname = hostname.split('.').slice(-3).join('.');
+        }
+        else {
+            hostname = hostname.split('.').slice(-2).join('.');
+        }
+        return hostname;
+    }
+    let hostname = getDomainName();
 
-    let removeURLList = [
-        "https://link.zhihu.com/?target=",
-        "http://link.zhihu.com/?target=",
-        "https://link.jianshu.com/?t=",
-        "https://links.jianshu.com/go?to=",
-        "https://link.juejin.im/?target="
-    ];
+    let WebSite = {};
+    WebSite["zhihu.com"] = {};
+    WebSite["zhihu.com"]["removeURLList"] = ["https://link.zhihu.com/?target="];
+    WebSite["juejin.im"] = {};
+    WebSite["juejin.im"]["removeURLList"] = ["https://link.juejin.im/?target="];
+    WebSite["jianshu.com"] = {};
+    WebSite["jianshu.com"]["removeURLList"] = ["https://link.jianshu.com/?t=", "https://links.jianshu.com/go?to="];
+    let obj = JSON.parse(GM_getValue("Phoenix_City_WebSite", false));
+    if (obj == false) {//没有网站对象
+        GM_setValue("Phoenix_City_WebSite", JSON.stringify(WebSite));
+    }
 
-    let len = removeURLList.length;
     let div = document.createElement("div");
     div.id = "removeLinksRedirection";
     div.innerText = "删除链接重定向";
     div.style.cssText = "width: 150px;font-size:15px;padding: 7px;bottom: 35px;left: 35px;z-index: 1000;background-color: #0077e6;position: fixed;border-radius: 25px;text-align: center;cursor: pointer;color: #fff;";
     div.onclick = function (e) {
         let links = document.links;
-        links = Array.from(links);
-        links.forEach(function (a) {
+        let len = links.length;
+
+        let removeURLList = [];
+
+        let Website = JSON.parse(GM_getValue("Phoenix_City_WebSite", "{}"));
+        if ((Website[hostname] && Website[hostname]["removeURLList"])) {
+            removeURLList = Website[hostname]["removeURLList"];
+        }
+        else {
+            let settled = false;
+            let arr = [];
+            alert("还没有为当前网站设置过要删除的跳转链接前缀！\n\n下面开始设置，只需设置一次，每个网站可以设置2个要删除的跳转链接前缀。");
+            let i = 0;
+            while (i < 2) {
+                let result = prompt("为当前网站设置要删除的跳转链接前缀\n链接必须以http或者https开头，并且带有？和=\n类似于：https://link.zhihu.com/?target=", "");
+                if (result == null) { i++; }
+                else {//点击了确定按钮
+                    if (!(result.startsWith("http") && result.includes("?") && result.includes("="))) {
+                        //链接格式错误！
+                        alert("链接格式错误！\n链接必须以http或者https开头，并且带有?和=\n类似于：https://link.zhihu.com/?target=");
+                    }
+                    else {
+                        //链接格式正确！
+                        console.log(result);
+                        let site = JSON.parse(GM_getValue("Phoenix_City_WebSite", "{}"));
+                        if ((site[hostname] && site[hostname]["removeURLList"])) {
+                            site[hostname]["removeURLList"].push(result);
+                        }
+                        else {
+                            site[hostname] = {};
+                            site[hostname]["removeURLList"] = [];
+                            site[hostname]["removeURLList"].push(result);
+                        }
+                        GM_setValue("Phoenix_City_WebSite", JSON.stringify(site));
+                        i++;
+                    }
+                }
+            }
+            if (!settled) { return; }
+        }
+
+        let len_URLList = removeURLList.length;
+        if (len_URLList == 0) { return; }
+        for (let i = 0; i < len; i++) {
+            const a = links[i];
             let href = a.href;
-            for (let i = 0; i < len; i++) {
-                let url = removeURLList[i];
+            if (!href.startsWith("http")) { continue; }
+            for (let j = 0; j < len_URLList; j++) {
+                const url = removeURLList[j];
+                if (!url.startsWith("http")) { continue; }
                 href = href.replace(url, '');
             }
             if (href.startsWith("http")) {
@@ -47,11 +108,10 @@
             else {
                 console.log("错误的网址： ", a.href);
             }
-        });
+        }
         this.innerText = "操作成功！";
         setTimeout(function () { document.getElementById("removeLinksRedirection").innerText = "删除链接重定向"; }, 3000);
     }
-
     document.body.appendChild(div);
 
 })();
