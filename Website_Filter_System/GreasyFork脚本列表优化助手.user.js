@@ -214,7 +214,7 @@
                 this.innerText = GUI_strs.removefromblacklist;
             }
         }
-        installArea.appendChild(a3);
+        installArea.insertBefore(a3, installArea.querySelector("a.install-help-link").nextSibling);
     }
 
     if (document.querySelector("#browse-script-list")) {
