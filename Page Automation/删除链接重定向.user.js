@@ -6,7 +6,7 @@
 // @namespace             https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL            https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL             https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Page%20Automation/%E5%88%A0%E9%99%A4%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E5%90%91.user.js
-// @version               0.1.2
+// @version               0.1.3
 // @author                浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description           本脚本提供了一系列小工具，在您访问互联网网站的时候加快您访问网站的速度和提高您的工作效率。包括删除服务器重定向(支持全网网站)
 // @description:en        This script provides a series of small tools to speed up the speed of your visit to the website and improve your work efficiency.
@@ -17,6 +17,7 @@
 // @grant                 GM_setValue
 // @noframes
 // @note                  2020-04-10：添加删除服务器跳转功能。
+// @note                  2020-04-12：修改域名解析函数。
 // ==/UserScript==
 
 (function () {
