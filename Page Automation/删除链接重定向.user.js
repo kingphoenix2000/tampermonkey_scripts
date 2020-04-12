@@ -24,12 +24,12 @@
     'use strict';
     function getDomainName(str1) {
         let hostname = str1 || window.location.hostname;
-        hostname = hostname.split('.').slice(-2).join('.');
-        let CN_Sites = ["com.cn", "edu.cn", "gov.cn", "int.cn", "mil.cn", "net.cn", "org.cn", "biz.cn", "info.cn", "pro.cn", "name.cn", "museum.cn", "coop.cn", "aero.cn", "xxx.cn", "idv.cn", "mobi.cn", "cc.cn", "me.cn"];
-        if (CN_Sites.includes(hostname)) {//如果以.cn结尾，则取后三位
-            hostname = hostname.split('.').slice(-3).join('.');
+        let domain1 = hostname.split('.').slice(-2).join('.');
+        let CN_Sites = ["com.cn", "edu.cn", "gov.cn", "int.cn", "mil.cn", "net.cn", "org.cn", "biz.cn", "info.cn", "pro.cn", "name.cn", "museum.cn", "coop.cn", "aero.cn", "xxx.cn", "idv.cn", "mobi.cn", "cc.cn", "me.cn", "xin.cn", "top.cn", "xyz.cn", "vip.cn"];
+        if (CN_Sites.includes(domain1)) {//如果以.cn结尾，则取后三位
+            domain1 = hostname.split('.').slice(-3).join('.');
         }
-        return hostname;
+        return domain1;
     }
 
     let hostname = getDomainName();
