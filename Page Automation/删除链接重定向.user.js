@@ -23,14 +23,14 @@
     'use strict';
     function getDomainName(str1) {
         let hostname = str1 || window.location.hostname;
-        if (hostname.endsWith(".cn")) {//如果以.cn结尾，则取后三位
+        hostname = hostname.split('.').slice(-2).join('.');
+        let CN_Sites = ["com.cn", "edu.cn", "gov.cn", "int.cn", "mil.cn", "net.cn", "org.cn", "biz.cn", "info.cn", "pro.cn", "name.cn", "museum.cn", "coop.cn", "aero.cn", "xxx.cn", "idv.cn", "mobi.cn", "cc.cn", "me.cn"];
+        if (CN_Sites.includes(hostname)) {//如果以.cn结尾，则取后三位
             hostname = hostname.split('.').slice(-3).join('.');
-        }
-        else {
-            hostname = hostname.split('.').slice(-2).join('.');
         }
         return hostname;
     }
+
     let hostname = getDomainName();
 
     let WebSite = {};
