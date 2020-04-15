@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.1.5
+// @version      0.1.6
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -20,6 +20,7 @@
 // @note         2020-01-08 在用户主页用户名的后面增加当前用户开发的脚本安装总数
 // @note         2020-04-07 修复某些脚本名称带有引号导致解析错误的问题
 // @note         2020-04-10 脚本架构重写。支持中英文界面。
+// @note         2020-04-15 增加 代码、历史版本、反馈、统计数据等快捷入口。增加宽窄屏幕切换功能。
 // ==/UserScript==
 
 
@@ -50,11 +51,17 @@
             filter_input_placeholder: "请输入过滤关键字",
             showOnlyBtnValue: "过滤脚本",
             showAllBtnValue: "显示全部脚本",
+            switchBtnValue1: "宽屏",
+            switchBtnValue2: "窄屏",
             install: "安装脚本",
             remove: "删除脚本",
             addtoblacklist: "加入黑名单",
             removefromblacklist: "移除黑名单",
             authorotherscripts: "浴火凤凰的其它脚本",
+            code: "代码",
+            history: "历史版本",
+            feedback: "反馈",
+            stats: "统计数据",
         };
     }
     else {
@@ -63,11 +70,17 @@
             filter_input_placeholder: "Please enter filter keywords here...",
             showOnlyBtnValue: "Filter script",
             showAllBtnValue: "Show all scripts",
+            switchBtnValue1: "Wide Screen",
+            switchBtnValue2: "Normal Screen",
             install: "install",
             remove: "remove",
             addtoblacklist: "add to blacklist",
             removefromblacklist: "remove from blacklist",
             authorotherscripts: "Author's other scripts",
+            code: "Code",
+            history: "History",
+            feedback: "Feedback",
+            stats: "Stats",
         };
     }
 
@@ -108,8 +121,27 @@
                 items[i].style.display = "list-item";
             }
         }
+        let screenSize = true;
+        let content = document.querySelector("body > div.width-constraint");
+        let switchBtn = document.createElement("input");
+        switchBtn.type = "button";
+        switchBtn.value = GUI_strs.switchBtnValue1;
+        switchBtn.style.marginLeft = "15px";
+        switchBtn.onclick = function () {
+            if (screenSize) {
+                content.style.maxWidth = "95%";
+                switchBtn.value = GUI_strs.switchBtnValue2;
+                screenSize = false;
+            }
+            else {
+                content.style.maxWidth = "960px";
+                switchBtn.value = GUI_strs.switchBtnValue1;
+                screenSize = true;
+            }
+        }
         div.appendChild(showOnlyBtn);
         div.appendChild(showAllBtn);
+        div.appendChild(switchBtn);
         document.querySelector(selector).insertBefore(div, document.querySelector(selector).firstChild);
     }
 
@@ -172,10 +204,38 @@
             p.appendChild(document.createTextNode(" | "));
 
             let a4 = document.createElement('a');
-            a4.href = "https://greasyfork.org/zh-CN/users/289205-%E6%B5%B4%E7%81%AB%E5%87%A4%E5%87%B0";
-            a4.innerText = GUI_strs.authorotherscripts;
+            a4.href = li.querySelector("article > h2 > a").href + "/code";
+            a4.innerText = GUI_strs.code;
             a4.target = "_blank";
             p.appendChild(a4);
+            p.appendChild(document.createTextNode(" | "));
+
+            let a5 = document.createElement('a');
+            a5.href = li.querySelector("article > h2 > a").href + "/versions";
+            a5.innerText = GUI_strs.history;
+            a5.target = "_blank";
+            p.appendChild(a5);
+            p.appendChild(document.createTextNode(" | "));
+
+            let a6 = document.createElement('a');
+            a6.href = li.querySelector("article > h2 > a").href + "/feedback";
+            a6.innerText = GUI_strs.feedback;
+            a6.target = "_blank";
+            p.appendChild(a6);
+            p.appendChild(document.createTextNode(" | "));
+
+            let a7 = document.createElement('a');
+            a7.href = li.querySelector("article > h2 > a").href + "/stats";
+            a7.innerText = GUI_strs.stats;
+            a7.target = "_blank";
+            p.appendChild(a7);
+            p.appendChild(document.createTextNode(" | "));
+
+            let a8 = document.createElement('a');
+            a8.href = "https://greasyfork.org/zh-CN/users/289205-%E6%B5%B4%E7%81%AB%E5%87%a8%E5%87%B0";
+            a8.innerText = GUI_strs.authorotherscripts;
+            a8.target = "_blank";
+            p.appendChild(a8);
             p.appendChild(document.createTextNode(" | "));
             li.querySelector("article").appendChild(p);
         }
@@ -218,11 +278,13 @@
     }
 
     if (document.querySelector("#browse-script-list")) {
+        document.querySelector("#site-nav > nav > li.with-submenu").outerHTML = document.querySelector("#site-nav > nav > li.with-submenu > nav").innerHTML;
         addFilterSystem("#browse-script-list");
         hideScriptsInBlacklist("#browse-script-list");
         addLinks("#browse-script-list > li");
     }
     if (document.querySelector("#user-script-list")) {
+        document.querySelector("#site-nav > nav > li.with-submenu").outerHTML = document.querySelector("#site-nav > nav > li.with-submenu > nav").innerHTML;
         total_installs();
         addFilterSystem("#user-script-list");
         hideScriptsInBlacklist("#user-script-list");
