@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.1.6
+// @version      0.1.7
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -21,6 +21,7 @@
 // @note         2020-04-07 修复某些脚本名称带有引号导致解析错误的问题
 // @note         2020-04-10 脚本架构重写。支持中英文界面。
 // @note         2020-04-15 增加 代码、历史版本、反馈、统计数据等快捷入口。增加宽窄屏幕切换功能。
+// @note         2020-04-16 增加 脚本列表综合排序功能，支持三个条件关联排序。
 // ==/UserScript==
 
 
@@ -44,6 +45,7 @@
     }
 
     let GUI_strs = {};
+    let GUI_sort_Helper = {};
     let is_CN = location.href.includes("zh-");
     if (is_CN) {
         GUI_strs = {
@@ -53,6 +55,7 @@
             showAllBtnValue: "显示全部脚本",
             switchBtnValue1: "宽屏",
             switchBtnValue2: "窄屏",
+            sortBtnValue: "重新排序",
             install: "安装脚本",
             remove: "删除脚本",
             addtoblacklist: "加入黑名单",
@@ -62,7 +65,16 @@
             history: "历史版本",
             feedback: "反馈",
             stats: "统计数据",
+            ratingScore: "评分:",
+            sortDesc: "以下菜单对已经加载的脚本列表进行重新排序，从左到右排序菜单优先级依次降低。",
+            sortErrMsg: "选中的排序菜单的内容不能重复！",
         };
+        GUI_sort_Helper = {
+            daily_installs: "今日安装",
+            total_installs: "总安装量",
+            ratings: "得分",
+            // updated: "最近更新",
+        }
     }
     else {
         GUI_strs = {
@@ -72,6 +84,7 @@
             showAllBtnValue: "Show all scripts",
             switchBtnValue1: "Wide Screen",
             switchBtnValue2: "Normal Screen",
+            sortBtnValue: "sort current list",
             install: "install",
             remove: "remove",
             addtoblacklist: "add to blacklist",
@@ -81,9 +94,99 @@
             history: "History",
             feedback: "Feedback",
             stats: "Stats",
+            ratingScore: "Score:",
+            sortDesc: "The following menu reorders the list of scripts that have been loaded, and the priority of the drop-down menus decreases from left to right.",
+            sortErrMsg: "The contents of the selected sort menu cannot be repeated!"
         };
+        GUI_sort_Helper = {
+            daily_installs: "daily_installs",
+            total_installs: "total_installs",
+            ratings: "ratings",
+            // updated: "updated",
+        }
     }
+    let typeToDataSet = {
+        daily_installs: "scriptDailyInstalls",
+        total_installs: "scriptTotalInstalls",
+        ratings: "scriptRatingScore",
+        updated: "scriptUpdatedDate",
+    };
+    let pageSortType = "daily_installs";
+    let url = new URL(location.href);
+    let searchParams = url.searchParams;
+    if (!searchParams.get("sort")) {
+        // delete GUI_sort_Helper.daily_installs;
+    }
+    else {
+        pageSortType = searchParams.get("sort");
+        // delete GUI_sort_Helper[searchParams.get("sort")];
+    }
+    function addSortSelection(selector) {
+        let div = document.createElement("div");
+        div.id = "sort_select_list";
+        let h3 = document.createElement("h3");
+        h3.innerText = GUI_strs.sortDesc;
+        h3.style.cssText = "margin: 10px;color: #A42121;";
+        div.appendChild(h3);
+        for (let i = 0; i < 3; i++) {
+            let select = document.createElement("select");
+            select.innerHTML = '';
+            select.style.cssText = "width: 120px;height: 23px;margin-left:15px;";
+            for (const key in GUI_sort_Helper) {
+                if (GUI_sort_Helper.hasOwnProperty(key)) {
+                    const value = GUI_sort_Helper[key];
+                    select.innerHTML += `<option value="${key}">${value}</option>`;
+                }
+            }
+            div.appendChild(select);
+        }
+        let sortBtn = document.createElement("input");
+        sortBtn.type = "button";
+        sortBtn.value = GUI_strs.sortBtnValue;
+        sortBtn.style.marginLeft = "15px";
+        sortBtn.onclick = function () {
+            let selects = document.querySelectorAll("#sort_select_list > select");
+            let arr = [];
+            for (let i = 0; i < 3; i++) {
+                if (arr.includes(selects[i].value)) {
+                    alert(GUI_strs.sortErrMsg); return;
+                }
+                else {
+                    arr.push(selects[i].value);
+                }
+            }
+            // console.log(arr);
+            let items = document.querySelectorAll(selector + " > li");
+            let len = items.length;
+            items = [].slice.call(items);
+            items.sort(function (a, b) {
+                let n1 = +a.dataset[typeToDataSet[arr[0]]];
+                let n2 = +b.dataset[typeToDataSet[arr[0]]];
+                if (n2 != n1) {
+                    return n2 - n1;
+                }
+                else {
+                    let n3 = +a.dataset[typeToDataSet[arr[1]]];
+                    let n4 = +b.dataset[typeToDataSet[arr[1]]];
+                    if (n4 != n3) {
+                        return n4 - n3;
+                    }
+                    else {
+                        let n5 = +a.dataset[typeToDataSet[arr[2]]];
+                        let n6 = +b.dataset[typeToDataSet[arr[2]]];
+                        return n6 - n5;
 
+                    }
+                }
+            });
+            let p = document.querySelector(selector);
+            for (let j = 0; j < len; j++) {
+                p.appendChild(items[j]);
+            }
+        }
+        div.appendChild(sortBtn);
+        return div;
+    }
     function addFilterSystem(selector) {
         let div = document.createElement("div");
         let h2 = document.createElement("h2");
@@ -142,6 +245,7 @@
         div.appendChild(showOnlyBtn);
         div.appendChild(showAllBtn);
         div.appendChild(switchBtn);
+        div.appendChild(addSortSelection(selector));
         document.querySelector(selector).insertBefore(div, document.querySelector(selector).firstChild);
     }
 
@@ -168,6 +272,14 @@
             let p = document.createElement("p");
 
             if (!li.querySelector("article > h2 > a")) { continue; }
+            let dd = li.querySelector("article > dl > dd.script-list-ratings");
+            let span = document.createElement('span');
+            span.title = GUI_strs.ratingScore;
+            span.className = "good-rating-count";
+            span.style.cssText = "margin-left:5px;";
+            span.innerText = GUI_strs.ratingScore + dd.dataset.ratingScore;
+            dd.firstElementChild.appendChild(span);
+
             let a1 = document.createElement('a');
             a1.href = li.querySelector("article > h2 > a").href + "/code.user.js";
             a1.innerText = GUI_strs.install;
