@@ -52,8 +52,8 @@
         GUI_strs = {
             name: "GreasyFork网站助手",
             filter_input_placeholder: "请输入过滤关键字",
-            showOnlyBtnValue: "过滤脚本",
-            showAllBtnValue: "显示全部脚本",
+            showOnlyBtnValue: "筛选",
+            showAllBtnValue: "显示全部",
             showAlldiscussion: "显示全部讨论内容",
             switchBtnValue1: "宽屏",
             switchBtnValue2: "窄屏",
@@ -70,6 +70,10 @@
             ratingScore: "评分:",
             sortDesc: "以下菜单对已经加载的脚本列表进行重新排序，从左到右排序菜单优先级依次降低。",
             sortErrMsg: "选中的排序菜单的内容不能重复！",
+            question: "无评分",
+            good: "好评",
+            ok: "一般",
+            bad: "差评",
         };
         GUI_sort_Helper = {
             daily_installs: "今日安装",
@@ -82,8 +86,8 @@
         GUI_strs = {
             name: "GreasyFork Website Assistant",
             filter_input_placeholder: "Please enter filter keywords here...",
-            showOnlyBtnValue: "Filter script",
-            showAllBtnValue: "Show all scripts",
+            showOnlyBtnValue: "Filter",
+            showAllBtnValue: "Show All",
             showAlldiscussion: "Show all Discussions",
             switchBtnValue1: "Wide Screen",
             switchBtnValue2: "Normal Screen",
@@ -99,7 +103,11 @@
             stats: "Stats",
             ratingScore: "Score:",
             sortDesc: "The following menu reorders the list of scripts that have been loaded, and the priority of the drop-down menus decreases from left to right.",
-            sortErrMsg: "The contents of the selected sort menu cannot be repeated!"
+            sortErrMsg: "The contents of the selected sort menu cannot be repeated!",
+            question: "question",
+            good: "good",
+            ok: "ok",
+            bad: "bad",
         };
         GUI_sort_Helper = {
             daily_installs: "daily_installs",
@@ -367,6 +375,7 @@
         document.querySelector("body > div.width-constraint > section > h2").innerText = text + `(${sum})`;
     }
     function hideReplyByAuthor() {
+        if (!document.querySelector("#user-discussions-on-scripts-written")) { return; }
         let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
         text = `最终回复由 ${text} 发表于`;
         let items = document.querySelectorAll("#user-discussions-on-scripts-written > ul.discussion-list > li");
@@ -410,6 +419,70 @@
         }
         installArea.insertBefore(a3, installArea.querySelector("a.install-help-link").nextSibling);
     }
+    function addFilterSystem2(selector) {
+        let div = document.createElement("div");
+        let h2 = document.createElement("h2");
+        h2.style.cssText = "margin: 10px;color: #A42121;";
+        h2.innerText = GUI_strs.name;
+        div.appendChild(h2);
+        let input = document.createElement("input");
+        input.id = "filter_input";
+        input.type = "text";
+        input.value = "";
+        input.style.cssText = "margin: 10px;width: 300px;";
+        input.placeholder = GUI_strs.filter_input_placeholder;
+        div.appendChild(input);
+        let showOnlyBtn = document.createElement("input");
+        let items = document.querySelectorAll(selector + " > li");
+        let len = items.length;
+        showOnlyBtn.type = "button";
+        showOnlyBtn.value = GUI_strs.showOnlyBtnValue;
+        showOnlyBtn.style.marginLeft = "15px";
+        showOnlyBtn.onclick = function () {
+            let text = input.value.trim().toLowerCase();
+            for (let i = 0; i < len; i++) {
+                let text1 = items[i].innerText.trim().toLowerCase();
+                if (!text1.includes(text)) {
+                    items[i].style.display = "none";//隐藏掉不包含关键字的脚本 并且对隐藏掉的包含关键字的脚本不做处理。
+                }
+            }
+        }
+        let showAllBtn = document.createElement("input");
+        showAllBtn.type = "button";
+        showAllBtn.value = GUI_strs.showAllBtnValue;
+        showAllBtn.style.marginLeft = "15px";
+        showAllBtn.onclick = function () {
+            for (let i = 0; i < len; i++) {
+                items[i].style.display = "list-item";
+            }
+        }
+        div.appendChild(showOnlyBtn);
+        div.appendChild(showAllBtn);
+
+        let arr = ["question", "good", "ok", "bad"];
+        for (let i = 0; i < arr.length; i++) {
+            let showBtn = document.createElement("input");
+            showBtn.type = "button";
+            showBtn.value = GUI_strs[arr[i]];
+            showBtn.dataset.type = arr[i];
+            showBtn.style.marginLeft = "15px";
+            showBtn.onclick = function () {
+                let type = this.dataset.type;
+                for (let i = 0; i < len; i++) {
+                    let li = items[i];
+                    if (!li.className.includes(type)) {
+                        li.style.display = "none";//隐藏掉不包含关键字的脚本 并且对隐藏掉的包含关键字的脚本不做处理。
+                    }
+                    else {
+                        li.style.display = "list-item";
+                    }
+                }
+            }
+            div.appendChild(showBtn);
+        }
+
+        document.querySelector("#script-content").insertBefore(div, document.querySelector("#script-content > h3").nextElementSibling);
+    }
 
     if (document.querySelector("#browse-script-list")) {
         document.querySelector("#site-nav > nav > li.with-submenu").outerHTML = document.querySelector("#site-nav > nav > li.with-submenu > nav").innerHTML;
@@ -427,6 +500,9 @@
     }
     if (/\/scripts\/\d+-/.test(location.href)) {
         handle_blacklist();
+    }
+    if (location.href.includes("/feedback")) {
+        if (document.querySelector("#discussions")) { addFilterSystem2("#discussions"); }
     }
 
 
