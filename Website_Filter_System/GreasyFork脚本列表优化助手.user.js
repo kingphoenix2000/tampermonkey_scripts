@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.1.7
+// @version      0.1.8
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -22,6 +22,7 @@
 // @note         2020-04-10 脚本架构重写。支持中英文界面。
 // @note         2020-04-15 增加 代码、历史版本、反馈、统计数据等快捷入口。增加宽窄屏幕切换功能。
 // @note         2020-04-16 增加 脚本列表综合排序功能，支持三个条件关联排序。
+// @note         2020-04-19 增加 在用户主页自动隐藏最后回复者是脚本作者的讨论，减少讨论内容，减轻脚本作者的心理负担。
 // ==/UserScript==
 
 
@@ -53,6 +54,7 @@
             filter_input_placeholder: "请输入过滤关键字",
             showOnlyBtnValue: "过滤脚本",
             showAllBtnValue: "显示全部脚本",
+            showAlldiscussion: "显示全部讨论内容",
             switchBtnValue1: "宽屏",
             switchBtnValue2: "窄屏",
             sortBtnValue: "重新排序",
@@ -82,6 +84,7 @@
             filter_input_placeholder: "Please enter filter keywords here...",
             showOnlyBtnValue: "Filter script",
             showAllBtnValue: "Show all scripts",
+            showAlldiscussion: "Show all Discussions",
             switchBtnValue1: "Wide Screen",
             switchBtnValue2: "Normal Screen",
             sortBtnValue: "sort current list",
@@ -363,6 +366,25 @@
         let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
         document.querySelector("body > div.width-constraint > section > h2").innerText = text + `(${sum})`;
     }
+    function hideReplyByAuthor() {
+        let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
+        text = `最终回复由 ${text} 发表于`;
+        let items = document.querySelectorAll("#user-discussions-on-scripts-written > ul.discussion-list > li");
+        let len = items.length;
+        for (let i = 0; i < len; i++) {
+            if (items[i].innerText.includes(text)) { items[i].style.display = "none"; }
+        }
+        let showAllBtn = document.createElement("input");
+        showAllBtn.type = "button";
+        showAllBtn.value = GUI_strs.showAlldiscussion;
+        showAllBtn.style.marginLeft = "15px";
+        showAllBtn.onclick = function () {
+            for (let i = 0; i < len; i++) {
+                items[i].style.display = "list-item";
+            }
+        }
+        document.querySelector("#user-discussions-on-scripts-written > header").appendChild(showAllBtn);
+    }
     function handle_blacklist() {
         let installArea = document.querySelector("#install-area");
         if (!installArea) { return; }
@@ -397,6 +419,7 @@
     }
     if (document.querySelector("#user-script-list")) {
         document.querySelector("#site-nav > nav > li.with-submenu").outerHTML = document.querySelector("#site-nav > nav > li.with-submenu > nav").innerHTML;
+        hideReplyByAuthor();
         total_installs();
         addFilterSystem("#user-script-list");
         hideScriptsInBlacklist("#user-script-list");
