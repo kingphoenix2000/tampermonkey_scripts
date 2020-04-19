@@ -115,6 +115,15 @@
         this.innerText = "操作成功！";
         setTimeout(function () { document.getElementById("removeLinksRedirection").innerText = "删除链接重定向"; }, 3000);
     }
+
+    let div2 = document.createElement("div");
+    div2.id = "returnToTop";
+    div2.innerText = "回到顶部";
+    div2.style.cssText = "display:none;font-size:15px;padding: 7px;bottom: 35px;right: 35px;z-index: 1000;background-color: #0077e6;position: fixed;border-radius: 25px;text-align: center;cursor: pointer;color: #fff;";
+    div2.onclick = function () { scrollTo(0, 0); }
+    let height = document.documentElement.scrollHeight;
+    if (height > 2000) { div2.style.display = "block"; }
     document.body.appendChild(div);
+    document.body.appendChild(div2);
 
 })();
