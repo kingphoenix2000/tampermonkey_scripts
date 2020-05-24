@@ -53,6 +53,9 @@
         GUI_strs = {
             name: "GreasyFork网站助手",
             filter_input_placeholder: "请输入过滤关键字",
+            setKeywordsOfBlacklist: "设置屏蔽关键字",
+            keywordsDesc: "对于脚本名字和描述中包含下面的关键字的脚本会自动隐藏掉。在此可以设置一些关键字来过滤掉广告和垃圾脚本。支持设置多个关键字，用空格隔开。共有0个关键字。",
+            saveBtn: "保存",
             showOnlyBtnValue: "筛选",
             showAllBtnValue: "显示全部",
             showAlldiscussion: "显示全部讨论内容",
@@ -87,6 +90,9 @@
         GUI_strs = {
             name: "GreasyFork Website Assistant",
             filter_input_placeholder: "Please enter filter keywords here...",
+            setKeywordsOfBlacklist: "Set Blacklist Keywords",
+            keywordsDesc: "Scripts that contain the following keywords in the script name and description will be hidden automatically. Here you can set some keywords to filter out ads and spam scripts. Support setting multiple keywords, separated by spaces.Total: 0 keywords.",
+            saveBtn: "Save",
             showOnlyBtnValue: "Filter",
             showAllBtnValue: "Show All",
             showAlldiscussion: "Show all Discussions",
@@ -199,6 +205,37 @@
         div.appendChild(sortBtn);
         return div;
     }
+    function addKeywordsTextArea(selector) {
+        let div = document.createElement("div");
+        div.id = "keywords_blacklist";
+        let h3 = document.createElement("h3");
+        h3.style.cssText = "margin: 10px;color: #A42121;";
+        div.appendChild(h3);
+
+        let textarea1 = document.createElement("textarea");
+        textarea1.rows = "20";
+        textarea1.cols = "100";
+        let arr = JSON.parse(GM_getValue("keywords_Blacklists", "[]"));
+        textarea1.value = arr.join(" ");
+        h3.innerText = GUI_strs.keywordsDesc.replace(0, arr.length);
+
+        div.appendChild(textarea1);
+
+        let saveBtn1 = document.createElement("input");
+        saveBtn1.type = "button";
+        saveBtn1.value = GUI_strs.saveBtn;
+        saveBtn1.style.marginLeft = "15px";
+        saveBtn1.onclick = function () {
+            let val = textarea1.value.split(/\s+/);
+            if (val[val.length - 1] == '') { val.pop(); }
+            val = [...new Set(val)];
+            GM_setValue("keywords_Blacklists", JSON.stringify(val));
+            div.style.display = "none";
+        }
+        div.appendChild(saveBtn1);
+        div.style.display = "none";
+        return div;
+    }
     function addFilterSystem(selector) {
         let div = document.createElement("div");
         let h2 = document.createElement("h2");
@@ -212,6 +249,16 @@
         input.style.cssText = "margin: 10px;width: 300px;";
         input.placeholder = GUI_strs.filter_input_placeholder;
         div.appendChild(input);
+
+        let setKeywordsBtn = document.createElement("input");
+        setKeywordsBtn.type = "button";
+        setKeywordsBtn.value = GUI_strs.setKeywordsOfBlacklist;
+        setKeywordsBtn.style.marginLeft = "15px";
+        setKeywordsBtn.onclick = function () {
+            document.querySelector("#keywords_blacklist").style.display = "block";
+        }
+        div.appendChild(setKeywordsBtn);
+
         let showOnlyBtn = document.createElement("input");
         let items = document.querySelectorAll(selector + " > li");
         let len = items.length;
@@ -257,6 +304,7 @@
         div.appendChild(showOnlyBtn);
         div.appendChild(showAllBtn);
         div.appendChild(switchBtn);
+        div.appendChild(addKeywordsTextArea(selector));
         div.appendChild(addSortSelection(selector));
         document.querySelector(selector).insertBefore(div, document.querySelector(selector).firstChild);
     }
@@ -277,7 +325,6 @@
     }
     function hideScriptsByKeywords(selector) {
         let arr = JSON.parse(GM_getValue("keywords_Blacklists", "[]"));
-        arr = ["懒人专用", "百度文库"];
         let len2 = arr.length;
         let node_lis = document.querySelectorAll(selector + " > li");
         let len = node_lis.length;
