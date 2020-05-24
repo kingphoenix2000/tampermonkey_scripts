@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.1.8
+// @version      0.1.9
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -23,6 +23,7 @@
 // @note         2020-04-15 增加 代码、历史版本、反馈、统计数据等快捷入口。增加宽窄屏幕切换功能。
 // @note         2020-04-16 增加 脚本列表综合排序功能，支持三个条件关联排序。
 // @note         2020-04-19 增加 在用户主页自动隐藏最后回复者是脚本作者的讨论，减少讨论内容，减轻脚本作者的心理负担。
+// @note         2020-05-24 增加 按照关键字列表隐藏脚本的功能。
 // ==/UserScript==
 
 
@@ -274,6 +275,25 @@
             }
         }
     }
+    function hideScriptsByKeywords(selector) {
+        let arr = JSON.parse(GM_getValue("keywords_Blacklists", "[]"));
+        arr = ["懒人专用", "百度文库"];
+        let len2 = arr.length;
+        let node_lis = document.querySelectorAll(selector + " > li");
+        let len = node_lis.length;
+        for (let i = 0; i < len; i++) {
+            let li = node_lis[i];
+            if (!li.querySelector("article > h2 > a")) { continue; }
+            //取出脚本标题和描述
+            let text = li.querySelector("article > h2").innerText;
+            for (let j = 0; j < len2; j++) {
+                if (text.includes(arr[j])) {
+                    li.style.display = "none";//隐藏掉黑名单里的脚本
+                    break;
+                }
+            }
+        }
+    }
     function addLinks(selector) {
         let arr = JSON.parse(GM_getValue("scriptIds_Blacklists", "[]"));
         let node_lis = document.querySelectorAll(selector);
@@ -488,6 +508,7 @@
         document.querySelector("#site-nav > nav > li.with-submenu").outerHTML = document.querySelector("#site-nav > nav > li.with-submenu > nav").innerHTML;
         addFilterSystem("#browse-script-list");
         hideScriptsInBlacklist("#browse-script-list");
+        hideScriptsByKeywords("#browse-script-list");
         addLinks("#browse-script-list > li");
     }
     if (document.querySelector("#user-script-list")) {
@@ -496,6 +517,7 @@
         total_installs();
         addFilterSystem("#user-script-list");
         hideScriptsInBlacklist("#user-script-list");
+        hideScriptsByKeywords("#user-script-list");
         addLinks("#user-script-list > li");
     }
     if (/\/scripts\/\d+-/.test(location.href)) {
