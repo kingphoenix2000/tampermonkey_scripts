@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.1.8
+// @version      0.1.9
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -23,6 +23,7 @@
 // @note         2020-04-15 增加 代码、历史版本、反馈、统计数据等快捷入口。增加宽窄屏幕切换功能。
 // @note         2020-04-16 增加 脚本列表综合排序功能，支持三个条件关联排序。
 // @note         2020-04-19 增加 在用户主页自动隐藏最后回复者是脚本作者的讨论，减少讨论内容，减轻脚本作者的心理负担。
+// @note         2020-05-24 增加 按照关键字列表隐藏脚本的功能。
 // ==/UserScript==
 
 
@@ -52,6 +53,9 @@
         GUI_strs = {
             name: "GreasyFork网站助手",
             filter_input_placeholder: "请输入过滤关键字",
+            setKeywordsOfBlacklist: "设置屏蔽关键字",
+            keywordsDesc: "对于脚本名字和描述中包含下面的关键字的脚本会自动隐藏掉。在此可以设置一些关键字来过滤掉广告和垃圾脚本。支持设置多个关键字，用空格隔开。共有0个关键字。",
+            saveBtn: "保存",
             showOnlyBtnValue: "筛选",
             showAllBtnValue: "显示全部",
             showAlldiscussion: "显示全部讨论内容",
@@ -86,6 +90,9 @@
         GUI_strs = {
             name: "GreasyFork Website Assistant",
             filter_input_placeholder: "Please enter filter keywords here...",
+            setKeywordsOfBlacklist: "Set Blacklist Keywords",
+            keywordsDesc: "Scripts that contain the following keywords in the script name and description will be hidden automatically. Here you can set some keywords to filter out ads and spam scripts. Support setting multiple keywords, separated by spaces.Total: 0 keywords.",
+            saveBtn: "Save",
             showOnlyBtnValue: "Filter",
             showAllBtnValue: "Show All",
             showAlldiscussion: "Show all Discussions",
@@ -198,6 +205,37 @@
         div.appendChild(sortBtn);
         return div;
     }
+    function addKeywordsTextArea(selector) {
+        let div = document.createElement("div");
+        div.id = "keywords_blacklist";
+        let h3 = document.createElement("h3");
+        h3.style.cssText = "margin: 10px;color: #A42121;";
+        div.appendChild(h3);
+
+        let textarea1 = document.createElement("textarea");
+        textarea1.rows = "20";
+        textarea1.cols = "100";
+        let arr = JSON.parse(GM_getValue("keywords_Blacklists", "[]"));
+        textarea1.value = arr.join(" ");
+        h3.innerText = GUI_strs.keywordsDesc.replace(0, arr.length);
+
+        div.appendChild(textarea1);
+
+        let saveBtn1 = document.createElement("input");
+        saveBtn1.type = "button";
+        saveBtn1.value = GUI_strs.saveBtn;
+        saveBtn1.style.marginLeft = "15px";
+        saveBtn1.onclick = function () {
+            let val = textarea1.value.split(/\s+/);
+            if (val[val.length - 1] == '') { val.pop(); }
+            val = [...new Set(val)];
+            GM_setValue("keywords_Blacklists", JSON.stringify(val));
+            div.style.display = "none";
+        }
+        div.appendChild(saveBtn1);
+        div.style.display = "none";
+        return div;
+    }
     function addFilterSystem(selector) {
         let div = document.createElement("div");
         let h2 = document.createElement("h2");
@@ -211,6 +249,16 @@
         input.style.cssText = "margin: 10px;width: 300px;";
         input.placeholder = GUI_strs.filter_input_placeholder;
         div.appendChild(input);
+
+        let setKeywordsBtn = document.createElement("input");
+        setKeywordsBtn.type = "button";
+        setKeywordsBtn.value = GUI_strs.setKeywordsOfBlacklist;
+        setKeywordsBtn.style.marginLeft = "15px";
+        setKeywordsBtn.onclick = function () {
+            document.querySelector("#keywords_blacklist").style.display = "block";
+        }
+        div.appendChild(setKeywordsBtn);
+
         let showOnlyBtn = document.createElement("input");
         let items = document.querySelectorAll(selector + " > li");
         let len = items.length;
@@ -256,6 +304,7 @@
         div.appendChild(showOnlyBtn);
         div.appendChild(showAllBtn);
         div.appendChild(switchBtn);
+        div.appendChild(addKeywordsTextArea(selector));
         div.appendChild(addSortSelection(selector));
         document.querySelector(selector).insertBefore(div, document.querySelector(selector).firstChild);
     }
@@ -271,6 +320,24 @@
             let scriptId = li.dataset.scriptId;
             if (scriptId && arr.includes(scriptId)) {
                 li.style.display = "none";//隐藏掉黑名单里的脚本
+            }
+        }
+    }
+    function hideScriptsByKeywords(selector) {
+        let arr = JSON.parse(GM_getValue("keywords_Blacklists", "[]"));
+        let len2 = arr.length;
+        let node_lis = document.querySelectorAll(selector + " > li");
+        let len = node_lis.length;
+        for (let i = 0; i < len; i++) {
+            let li = node_lis[i];
+            if (!li.querySelector("article > h2 > a")) { continue; }
+            //取出脚本标题和描述
+            let text = li.querySelector("article > h2").innerText;
+            for (let j = 0; j < len2; j++) {
+                if (text.includes(arr[j])) {
+                    li.style.display = "none";//隐藏掉黑名单里的脚本
+                    break;
+                }
             }
         }
     }
@@ -488,6 +555,7 @@
         document.querySelector("#site-nav > nav > li.with-submenu").outerHTML = document.querySelector("#site-nav > nav > li.with-submenu > nav").innerHTML;
         addFilterSystem("#browse-script-list");
         hideScriptsInBlacklist("#browse-script-list");
+        hideScriptsByKeywords("#browse-script-list");
         addLinks("#browse-script-list > li");
     }
     if (document.querySelector("#user-script-list")) {
@@ -496,6 +564,7 @@
         total_installs();
         addFilterSystem("#user-script-list");
         hideScriptsInBlacklist("#user-script-list");
+        hideScriptsByKeywords("#user-script-list");
         addLinks("#user-script-list > li");
     }
     if (/\/scripts\/\d+-/.test(location.href)) {
