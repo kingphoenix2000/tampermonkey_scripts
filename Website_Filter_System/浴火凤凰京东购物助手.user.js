@@ -6,7 +6,7 @@
 // @namespace             https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL            https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL             https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/%E6%B5%B4%E7%81%AB%E5%87%A4%E5%87%B0%E4%BA%AC%E4%B8%9C%E8%B4%AD%E7%89%A9%E5%8A%A9%E6%89%8B.user.js
-// @version               0.1.1
+// @version               0.1.2
 // @author                浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description           在京东商城的商品搜索结果页面商品列表顶部生成一个筛选按钮，点击按钮会生成一系列筛选条件，可以按照店铺、商品标签、商品内容包含的关键字、商品价格、商品评价数等等类别进行筛选。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:en        Generate a filter button at the top of the goods list on the goods search results page of JD.com. Clicking the button will generate a series of filter conditions, so goods can be filtered according to the categories of shop name, goods label, keywords, goods price, goods comments, etc.作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -103,6 +103,15 @@
         }
 
         function setShowAllBtn() {
+            let input = document.createElement("input");
+            input.type = "checkbox";
+            input.id = "filterType";
+            operationTypeDiv.appendChild(input);
+            let label = document.createElement("label");
+            label.innerText = "在原来过滤结果基础上进行再次过滤";
+            label.htmlFor = "filterType";
+            operationTypeDiv.appendChild(label);
+
             let button = document.createElement("input");
             button.type = "button";
             button.value = "显示全部商品";
@@ -275,6 +284,7 @@
                 if (shop.checked) { shopNames.push(shop.value); }
             }
             // console.log("选择的店铺列表", shopNames);
+            let checked = document.querySelector("#filterType").checked;
             for (let i = 0; i < len; i++) {
                 let li = items[i];
                 let shopNode = li.querySelector("div.p-shop > span > a");
@@ -282,11 +292,22 @@
                 if (shopNode) {
                     let text = shopNode.innerText;
                     if (shopNames.includes(text)) {
-                        li.style.display = display1;
+                        if (display1 == "list-item") {
+                            if (!checked) { li.style.display = display1; }
+                        }
+                        else {
+                            li.style.display = display1;
+                        }
                     }
                     else {
-                        li.style.display = display2;
+                        if (display2 == "list-item") {
+                            if (!checked) { li.style.display = display2; }
+                        }
+                        else {
+                            li.style.display = display2;
+                        }
                     }
+
                 }
             }
         }
@@ -318,13 +339,24 @@
                     else { validNodes.push(li); }
                 }
             }
+            let checked = document.querySelector("#filterType").checked;
             for (let i = 0; i < validNodes.length; i++) {
                 const li = validNodes[i];
-                li.style.display = display1;
+                if (display1 == "list-item") {
+                    if (!checked) { li.style.display = display1; }
+                }
+                else {
+                    li.style.display = display1;
+                }
             }
             for (let i = 0; i < invalidNodes.length; i++) {
                 const li = invalidNodes[i];
-                li.style.display = display2;
+                if (display2 == "list-item") {
+                    if (!checked) { li.style.display = display2; }
+                }
+                else {
+                    li.style.display = display2;
+                }
             }
         }
         function handlePriceFilter(display1, display2) {
@@ -347,13 +379,25 @@
                     else { invalidNodes.push(li); }
                 }
             }
+
+            let checked = document.querySelector("#filterType").checked;
             for (let i = 0; i < validNodes.length; i++) {
                 const li = validNodes[i];
-                li.style.display = display1;
+                if (display1 == "list-item") {
+                    if (!checked) { li.style.display = display1; }
+                }
+                else {
+                    li.style.display = display1;
+                }
             }
             for (let i = 0; i < invalidNodes.length; i++) {
                 const li = invalidNodes[i];
-                li.style.display = display2;
+                if (display2 == "list-item") {
+                    if (!checked) { li.style.display = display2; }
+                }
+                else {
+                    li.style.display = display2;
+                }
             }
         }
         function handleCommentFilter(display1, display2) {
@@ -376,13 +420,24 @@
                     else { invalidNodes.push(li); }
                 }
             }
+            let checked = document.querySelector("#filterType").checked;
             for (let i = 0; i < validNodes.length; i++) {
                 const li = validNodes[i];
-                li.style.display = display1;
+                if (display1 == "list-item") {
+                    if (!checked) { li.style.display = display1; }
+                }
+                else {
+                    li.style.display = display1;
+                }
             }
             for (let i = 0; i < invalidNodes.length; i++) {
                 const li = invalidNodes[i];
-                li.style.display = display2;
+                if (display2 == "list-item") {
+                    if (!checked) { li.style.display = display2; }
+                }
+                else {
+                    li.style.display = display2;
+                }
             }
         }
         function handleAllkeywordFilter(display1, display2) {
@@ -409,13 +464,24 @@
                     else { validNodes.push(li); }
                 }
             }
+            let checked = document.querySelector("#filterType").checked;
             for (let i = 0; i < validNodes.length; i++) {
                 const li = validNodes[i];
-                li.style.display = display1;
+                if (display1 == "list-item") {
+                    if (!checked) { li.style.display = display1; }
+                }
+                else {
+                    li.style.display = display1;
+                }
             }
             for (let i = 0; i < invalidNodes.length; i++) {
                 const li = invalidNodes[i];
-                li.style.display = display2;
+                if (display2 == "list-item") {
+                    if (!checked) { li.style.display = display2; }
+                }
+                else {
+                    li.style.display = display2;
+                }
             }
         }
         function handleAnykeywordFilter(display1, display2) {
@@ -442,13 +508,24 @@
                     else { invalidNodes.push(li); }
                 }
             }
+            let checked = document.querySelector("#filterType").checked;
             for (let i = 0; i < validNodes.length; i++) {
                 const li = validNodes[i];
-                li.style.display = display1;
+                if (display1 == "list-item") {
+                    if (!checked) { li.style.display = display1; }
+                }
+                else {
+                    li.style.display = display1;
+                }
             }
             for (let i = 0; i < invalidNodes.length; i++) {
                 const li = invalidNodes[i];
-                li.style.display = display2;
+                if (display2 == "list-item") {
+                    if (!checked) { li.style.display = display2; }
+                }
+                else {
+                    li.style.display = display2;
+                }
             }
         }
 
