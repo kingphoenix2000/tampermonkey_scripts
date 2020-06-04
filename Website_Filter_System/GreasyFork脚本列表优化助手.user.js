@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.1.9
+// @version      0.2.0
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -24,6 +24,7 @@
 // @note         2020-04-16 增加 脚本列表综合排序功能，支持三个条件关联排序。
 // @note         2020-04-19 增加 在用户主页自动隐藏最后回复者是脚本作者的讨论，减少讨论内容，减轻脚本作者的心理负担。
 // @note         2020-05-24 增加 按照关键字列表隐藏脚本的功能。
+// @note         2020-06-04 由于GreasyFork网站改版，修改用户首页部分脚本代码，默认自动隐藏作者已经回复的讨论内容。
 // ==/UserScript==
 
 
@@ -445,7 +446,7 @@
         if (!document.querySelector("#user-discussions-on-scripts-written")) { return; }
         let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
         text = `最终回复由 ${text} 发表于`;
-        let items = document.querySelectorAll("#user-discussions-on-scripts-written > ul.discussion-list > li");
+        let items = document.querySelectorAll("#user-discussions-on-scripts-written > ul > li");
         let len = items.length;
         for (let i = 0; i < len; i++) {
             if (items[i].innerText.includes(text)) { items[i].style.display = "none"; }
