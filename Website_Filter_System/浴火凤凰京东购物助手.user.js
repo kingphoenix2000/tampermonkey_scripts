@@ -1,4 +1,3 @@
-
 // ==UserScript==
 // @name                  浴火凤凰京东购物助手
 // @name:en               JD.com Shopping Assistant
@@ -6,13 +5,15 @@
 // @namespace             https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL            https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL             https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/%E6%B5%B4%E7%81%AB%E5%87%A4%E5%87%B0%E4%BA%AC%E4%B8%9C%E8%B4%AD%E7%89%A9%E5%8A%A9%E6%89%8B.user.js
-// @version               0.1.2
+// @version               0.1.3
 // @author                浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description           在京东商城的商品搜索结果页面商品列表顶部生成一个筛选按钮，点击按钮会生成一系列筛选条件，可以按照店铺、商品标签、商品内容包含的关键字、商品价格、商品评价数等等类别进行筛选。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:en        Generate a filter button at the top of the goods list on the goods search results page of JD.com. Clicking the button will generate a series of filter conditions, so goods can be filtered according to the categories of shop name, goods label, keywords, goods price, goods comments, etc.作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN     在京东商城的商品搜索结果页面商品列表顶部生成一个筛选按钮，点击按钮会生成一系列筛选条件，可以按照店铺、商品标签、商品内容包含的关键字、商品价格、商品评价数等等类别进行筛选。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @homepage              https://blog.csdn.net/kingwolf_javascript/
 // @include               https://search.jd.com/*
+// @include               https://list.jd.com/search*
+// @include               https://list.jd.com/list.html?*
 // @grant                 none
 // ==/UserScript==
 
@@ -554,7 +555,8 @@
     }
 
 
-    if (location.href.toLowerCase().includes("https://search.jd.com/search?keyword=")) {
+    if (location.href.toLowerCase().includes("https://search.jd.com/")
+        || location.href.toLowerCase().includes("https://list.jd.com/")) {
         let div = document.createElement("div");
         div.id = "ecommerce_filter_wrapper";
         let ecommerce_filter = document.createElement("div");
