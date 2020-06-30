@@ -446,8 +446,8 @@
     function hideReplyByAuthor() {
         if (!document.querySelector("#user-discussions-on-scripts-written")) { return; }
         let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
-        text = `最终回复由 ${text} 发表于`;
-        let items = document.querySelectorAll("#user-discussions-on-scripts-written > ul > li");
+        text = `最后讨论: ${text}作者`;
+        let items = document.querySelectorAll("#user-discussions-on-scripts-written > div.discussion-list-item");
         let len = items.length;
         for (let i = 0; i < len; i++) {
             if (items[i].innerText.includes(text)) { items[i].style.display = "none"; }
@@ -458,7 +458,7 @@
         showAllBtn.style.marginLeft = "15px";
         showAllBtn.onclick = function () {
             for (let i = 0; i < len; i++) {
-                items[i].style.display = "list-item";
+                items[i].style.display = "block";
             }
         }
         document.querySelector("#user-discussions-on-scripts-written > header").appendChild(showAllBtn);
