@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.2.0
+// @version      0.2.1
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -25,6 +25,7 @@
 // @note         2020-04-19 增加 在用户主页自动隐藏最后回复者是脚本作者的讨论，减少讨论内容，减轻脚本作者的心理负担。
 // @note         2020-05-24 增加 按照关键字列表隐藏脚本的功能。
 // @note         2020-06-04 由于GreasyFork网站改版，修改用户首页部分脚本代码，默认自动隐藏作者已经回复的讨论内容。
+// @note         2020-06-30 由于GreasyFork网站改版，修改脚本反馈部分脚本代码。
 // ==/UserScript==
 
 
@@ -501,7 +502,7 @@
         input.placeholder = GUI_strs.filter_input_placeholder;
         div.appendChild(input);
         let showOnlyBtn = document.createElement("input");
-        let items = document.querySelectorAll(selector + " > li");
+        let items = document.querySelectorAll(selector + " > div.discussion-list-item");
         let len = items.length;
         showOnlyBtn.type = "button";
         showOnlyBtn.value = GUI_strs.showOnlyBtnValue;
@@ -521,7 +522,7 @@
         showAllBtn.style.marginLeft = "15px";
         showAllBtn.onclick = function () {
             for (let i = 0; i < len; i++) {
-                items[i].style.display = "list-item";
+                items[i].style.display = "block";
             }
         }
         div.appendChild(showOnlyBtn);
@@ -536,13 +537,32 @@
             showBtn.style.marginLeft = "15px";
             showBtn.onclick = function () {
                 let type = this.dataset.type;
-                for (let i = 0; i < len; i++) {
-                    let li = items[i];
-                    if (!li.className.includes(type)) {
-                        li.style.display = "none";//隐藏掉不包含关键字的脚本 并且对隐藏掉的包含关键字的脚本不做处理。
+                if (type == "question") {
+                    // 没有评分按钮
+                    for (let i = 0; i < len; i++) {
+                        let span = items[i].querySelector("a.discussion-title > span.rating-icon");
+                        if (span) {
+                            items[i].style.display = "none";//隐藏掉不包含关键字的脚本 并且对隐藏掉的包含关键字的脚本不做处理。
+                        }
+                        else {
+                            items[i].style.display = "block";
+                        }
                     }
-                    else {
-                        li.style.display = "list-item";
+                }
+                else {//有评分按钮
+                    for (let i = 0; i < len; i++) {
+                        let span = items[i].querySelector("a.discussion-title > span.rating-icon");
+                        if (span) {
+                            if (!span.className.includes(type)) {
+                                items[i].style.display = "none";//隐藏掉不包含关键字的脚本 并且对隐藏掉的包含关键字的脚本不做处理。
+                            }
+                            else {
+                                items[i].style.display = "block";
+                            }
+                        }
+                        else {
+                            items[i].style.display = "none";//不存在评分按钮，说明是无评分类别 应该隐藏。
+                        }
                     }
                 }
             }
@@ -572,7 +592,7 @@
         handle_blacklist();
     }
     if (location.href.includes("/feedback")) {
-        if (document.querySelector("#discussions")) { addFilterSystem2("#discussions"); }
+        if (document.querySelector(".script-discussion-list")) { addFilterSystem2(".script-discussion-list"); }
     }
 
 
