@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.2.2
+// @version      0.2.3
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -55,7 +55,7 @@
     if (is_CN) {
         GUI_strs = {
             name: "GreasyFork网站助手",
-            filter_input_placeholder: "请输入过滤关键字",
+            filter_input_placeholder: "在此输入过滤关键字...",
             setKeywordsOfBlacklist: "设置屏蔽关键字",
             keywordsDesc: "对于脚本名字和描述中包含下面的关键字的脚本会自动隐藏掉。在此可以设置一些关键字来过滤掉广告和垃圾脚本。支持设置多个关键字，用空格隔开。共有0个关键字。",
             saveBtn: "保存",
