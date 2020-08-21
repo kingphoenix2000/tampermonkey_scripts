@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.2.3
+// @version      0.2.4
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -362,7 +362,10 @@
             dd.firstElementChild.appendChild(span);
 
             let a1 = document.createElement('a');
-            a1.href = li.querySelector("article > h2 > a").href + "/code.user.js";
+            let href = li.querySelector("article > h2 > a").href.split('/').slice(-1);
+            if (href) { href = href[0]; }
+            let href2 = "https://greasyfork.org/scripts/" + href + "/code/" + encodeURIComponent(li.getAttribute("data-script-name")) + ".user.js";
+            a1.href = href2;
             a1.innerText = GUI_strs.install;
             p.appendChild(a1);
             p.appendChild(document.createTextNode(" | "));
@@ -448,7 +451,7 @@
         if (!document.querySelector("#user-discussions-on-scripts-written")) { return; }
         let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
         text = `最后讨论: ${text}作者`;
-        let items = document.querySelectorAll("#user-discussions-on-scripts-written > div.discussion-list-item");
+        let items = document.querySelectorAll("#user-discussions-on-scripts-written .discussion-list-container");
         let len = items.length;
         for (let i = 0; i < len; i++) {
             if (items[i].innerText.includes(text)) { items[i].style.display = "none"; }
@@ -503,7 +506,7 @@
         input.placeholder = GUI_strs.filter_input_placeholder;
         div.appendChild(input);
         let showOnlyBtn = document.createElement("input");
-        let items = document.querySelectorAll(selector + " > div.discussion-list-item");
+        let items = document.querySelectorAll(selector + " .discussion-list-container");
         let len = items.length;
         showOnlyBtn.type = "button";
         showOnlyBtn.value = GUI_strs.showOnlyBtnValue;
@@ -570,7 +573,7 @@
             div.appendChild(showBtn);
         }
 
-        document.querySelector("#script-content > div.post-discussion").insertBefore(div, document.querySelector("#script-content > div.post-discussion > h3:nth-child(1)").nextElementSibling);
+        document.querySelector("#script-content > div.post-discussion").insertBefore(div, document.querySelector("#script-content > div > div.script-discussion-list"));
     }
 
     if (document.querySelector("#browse-script-list")) {
