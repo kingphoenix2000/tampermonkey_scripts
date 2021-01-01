@@ -1,4 +1,3 @@
-
 // ==UserScript==
 // @name                  网站好帮手
 // @name:en               Website helper
@@ -6,7 +5,7 @@
 // @namespace             https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL            https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL             https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Page%20Automation/%E5%88%A0%E9%99%A4%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E5%90%91.user.js
-// @version               0.1.4
+// @version               0.1.5
 // @author                浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description           本脚本提供了一系列小工具，在您访问互联网网站的时候加快您访问网站的速度和提高您的工作效率。包括删除服务器重定向(支持全网网站)
 // @description:en        This script provides a series of small tools to speed up the speed of your visit to the website and improve your work efficiency.
@@ -15,6 +14,7 @@
 // @include               *
 // @grant                 GM_getValue
 // @grant                 GM_setValue
+// @grant                 GM_registerMenuCommand
 // @noframes
 // @note                  2020-04-10：添加删除服务器跳转功能。
 // @note                  2020-04-12：修改域名解析函数。
@@ -23,108 +23,112 @@
 
 (function () {
     'use strict';
-    function getDomainName(str1) {
-        let hostname = str1 || window.location.hostname;
-        let domain1 = hostname.split('.').slice(-2).join('.');
-        let CN_Sites = ["com.cn", "edu.cn", "gov.cn", "int.cn", "mil.cn", "net.cn", "org.cn", "biz.cn", "info.cn", "pro.cn", "name.cn", "museum.cn", "coop.cn", "aero.cn", "xxx.cn", "idv.cn", "mobi.cn", "cc.cn", "me.cn", "xin.cn", "top.cn", "xyz.cn", "vip.cn"];
-        if (CN_Sites.includes(domain1)) {//如果以.cn结尾，则取后三位
-            domain1 = hostname.split('.').slice(-3).join('.');
-        }
-        return domain1;
-    }
 
-    let hostname = getDomainName();
+    let div1 = document.createElement("div");
+    div1.id = "returnToTop";
+    div1.innerText = "回到顶部";
+    div1.style.cssText = "display:none;font-size:15px;padding: 10px;bottom: 5px;right: 5px;z-index: 1000;background-color: gray;position: fixed;border-radius: 25px;text-align: center;cursor: pointer;color: #fff;";
+    div1.onclick = function () { scrollTo(0, 0); }
+    let height = document.documentElement.scrollHeight;
+    if (height > 2000) { div1.style.display = "block"; }
+    document.body.appendChild(div1);
 
-    let WebSite = {};
-    WebSite["zhihu.com"] = {};
-    WebSite["zhihu.com"]["removeURLList"] = ["https://link.zhihu.com/?target="];
-    WebSite["juejin.im"] = {};
-    WebSite["juejin.im"]["removeURLList"] = ["https://link.juejin.im/?target="];
-    WebSite["jianshu.com"] = {};
-    WebSite["jianshu.com"]["removeURLList"] = ["https://link.jianshu.com/?t=", "https://links.jianshu.com/go?to="];
-    let obj = JSON.parse(GM_getValue("Phoenix_City_WebSite", false));
-    if (obj == false) {//没有网站对象
-        GM_setValue("Phoenix_City_WebSite", JSON.stringify(WebSite));
-    }
 
-    let div = document.createElement("div");
-    div.id = "removeLinksRedirection";
-    div.innerText = "删除链接重定向";
-    div.style.cssText = "width: 150px;font-size:15px;padding: 7px;bottom: 35px;left: 35px;z-index: 1000;background-color: #0077e6;position: fixed;border-radius: 25px;text-align: center;cursor: pointer;color: #fff;";
-    div.onclick = function (e) {
-        let links = document.links;
-        let len = links.length;
-
-        let removeURLList = [];
-
-        let Website = JSON.parse(GM_getValue("Phoenix_City_WebSite", "{}"));
-        if ((Website[hostname] && Website[hostname]["removeURLList"])) {
-            removeURLList = Website[hostname]["removeURLList"];
-        }
-        else {
-            let settled = false;
-            let arr = [];
-            alert("还没有为当前网站设置过要删除的跳转链接前缀！\n\n下面开始设置，只需设置一次，每个网站可以设置2个要删除的跳转链接前缀。");
-            let i = 0;
-            while (i < 2) {
-                let result = prompt("为当前网站设置要删除的跳转链接前缀\n链接必须以http或者https开头，并且带有？和=\n类似于：https://link.zhihu.com/?target=", "");
-                if (result == null) { i++; }
-                else {//点击了确定按钮
-                    if (!(result.startsWith("http") && result.includes("?") && result.includes("="))) {
-                        //链接格式错误！
-                        alert("链接格式错误！\n链接必须以http或者https开头，并且带有?和=\n类似于：https://link.zhihu.com/?target=");
-                    }
-                    else {
-                        //链接格式正确！
-                        console.log(result);
-                        let site = JSON.parse(GM_getValue("Phoenix_City_WebSite", "{}"));
-                        if ((site[hostname] && site[hostname]["removeURLList"])) {
-                            site[hostname]["removeURLList"].push(result);
-                        }
-                        else {
-                            site[hostname] = {};
-                            site[hostname]["removeURLList"] = [];
-                            site[hostname]["removeURLList"].push(result);
-                        }
-                        GM_setValue("Phoenix_City_WebSite", JSON.stringify(site));
-                        i++;
+    let WebSite = JSON.parse(GM_getValue("Phoenix_City_WebSite", false));
+    // console.log(WebSite);
+    let redirect_URL_list = [];
+    if (WebSite) {
+        //以下代码为升级版本的兼容性代码
+        if (!WebSite.Redirect_URL_List) {
+            for (let domain in WebSite) {
+                let links = WebSite[domain].removeURLList;
+                for (let i = 0; i < links.length; i++) {
+                    let url = links[i];
+                    if (!redirect_URL_list.includes(url)) {
+                        redirect_URL_list.push(url);
                     }
                 }
             }
-            if (!settled) { return; }
+            WebSite = {};
+            WebSite.Redirect_URL_List = redirect_URL_list;
+            console.log(WebSite);
+            GM_setValue("Phoenix_City_WebSite", JSON.stringify(WebSite));
         }
+    }
+    else {
+        WebSite = {};
+        WebSite.Redirect_URL_List = redirect_URL_list;
+    }
+    console.log(WebSite);
 
-        let len_URLList = removeURLList.length;
-        if (len_URLList == 0) { return; }
-        for (let i = 0; i < len; i++) {
-            const a = links[i];
-            let href = a.href;
-            if (!href.startsWith("http")) { continue; }
-            for (let j = 0; j < len_URLList; j++) {
-                const url = removeURLList[j];
-                if (!url.startsWith("http")) { continue; }
-                href = href.replace(url, '');
+    let num = 0;
+    function removeRedirectURL(msg, links) {
+        let len1 = WebSite.Redirect_URL_List.length;
+        for (let i = 0; i < links.length; i++) {
+            let href = links[i].href;
+
+            for (let j = 0; j < len1; j++) {
+                const url = WebSite.Redirect_URL_List[j];
+                href = decodeURIComponent(href.replace(url, ''));
             }
             if (href.startsWith("http")) {
-                href = decodeURIComponent(href);
-                a.href = href;
+                links[i].href = href;
             }
             else {
-                console.log("错误的网址： ", a.href);
+                console.log("错误的网址： ", links[i].href);
             }
         }
-        this.innerText = "操作成功！";
-        setTimeout(function () { document.getElementById("removeLinksRedirection").innerText = "删除链接重定向"; }, 3000);
+        num = num + links.length;
+        console.log(msg, "目前已经删除重定向的链接数：", num);
     }
+    //首先删除已经加载的超链接的重定向
+    removeRedirectURL("页面初始化阶段-->", document.links);
 
-    let div2 = document.createElement("div");
-    div2.id = "returnToTop";
-    div2.innerText = "回到顶部";
-    div2.style.cssText = "display:none;font-size:15px;padding: 7px;bottom: 35px;right: 35px;z-index: 1000;background-color: #0077e6;position: fixed;border-radius: 25px;text-align: center;cursor: pointer;color: #fff;";
-    div2.onclick = function () { scrollTo(0, 0); }
-    let height = document.documentElement.scrollHeight;
-    if (height > 2000) { div2.style.display = "block"; }
-    document.body.appendChild(div);
-    document.body.appendChild(div2);
+
+    const MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+    var mutationObserver = new MutationObserver(function (mutations, instance) {
+        //console.log(instance);
+        mutations.forEach(function (mutation) {
+            let addedNodes = mutation.addedNodes;
+            if (addedNodes.length > 0) {
+                addedNodes.forEach(function (node) {
+                    removeRedirectURL("页面链接动态加载阶段-->", node.querySelectorAll("a"));
+                });
+            }
+        });
+    });
+
+    // 开始监听页面根元素 HTML 变化。
+    mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    GM_registerMenuCommand("添加重定向链接", () => {
+        let url = prompt("链接必须以http或者https开头，并且带有？和=\n类似于：https://link.zhihu.com/?target=", "");
+        if (url) {
+            if (WebSite.Redirect_URL_List.includes(url)) {
+                console.log(`要添加的重定向URL：${url}已经存在。`);
+            }
+            else {
+                WebSite.Redirect_URL_List.push(url);
+                GM_setValue("Phoenix_City_WebSite", JSON.stringify(WebSite));
+                console.log(`重定向URL：${url} 添加成功。`);
+            }
+        }
+    });
+    GM_registerMenuCommand("删除重定向链接", () => {
+        let url = prompt("链接必须以http或者https开头，并且带有？和=\n类似于：https://link.zhihu.com/?target=", "");
+        if (url) {
+            let index = WebSite.Redirect_URL_List.indexOf(url);
+            if (index == -1) {
+                console.log(`找不到要删除的重定向URL：${url}。`);
+            }
+            else {
+                WebSite.Redirect_URL_List.splice(index, 1);
+                GM_setValue("Phoenix_City_WebSite", JSON.stringify(WebSite));
+                console.log(`重定向URL：${url} 删除成功。`);
+            }
+        }
+    });
 
 })();
