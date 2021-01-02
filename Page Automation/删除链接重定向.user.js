@@ -66,16 +66,25 @@
         let len1 = WebSite.Redirect_URL_List.length;
         for (let i = 0; i < links.length; i++) {
             let href = links[i].href;
-
+            if (!href.startsWith("http://") && !href.startsWith("https://")) { continue; }
             for (let j = 0; j < len1; j++) {
                 const url = WebSite.Redirect_URL_List[j];
-                href = decodeURIComponent(href.replace(url, ''));
+                //只删除 网址开头 是重定向URL的链接，并且只删除一个重定向URL
+                if (href.startsWith(url)) {
+                    href = href.replace(url, ''); break;
+                }
             }
             if (href.startsWith("http")) {
-                links[i].href = href;
+                try {
+                    href = decodeURIComponent(href);
+                    links[i].href = href;
+                }
+                catch (e) {
+                    console.log(`URL解码发生错误：${href}`);
+                }
             }
             else {
-                console.log("错误的网址： ", links[i].href);
+                console.log("发现类似重定向，实际上不是重定向的网址： ", links[i].href);
             }
         }
         num = num + links.length;
