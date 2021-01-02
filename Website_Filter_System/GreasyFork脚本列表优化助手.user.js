@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.2.5
+// @version      0.2.6
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-CN  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -576,6 +576,37 @@
         document.querySelector("#script-content > div.post-discussion").insertBefore(div, document.querySelector("#script-content > div > div.script-discussion-list"));
     }
 
+    function redirection_for_login() {
+        let homePage = location.href;
+        if (true) {
+            let notice = document.querySelector("body > div > p.notice");
+            if (notice) {
+                let referer = document.referrer;
+                let prefix = homePage + "/users/sign_in?return_to=";
+                if (referer.includes(prefix)) {
+                    let href = "https://greasyfork.org" + referer.replace(prefix, '');
+                    if (href != homePage) {
+                        location.href = href;
+                    }
+                }
+            }
+
+        }
+    }
+    function redirection_for_logout() {
+        let homePage = location.href;
+        if (true) {
+            let notice = document.querySelector("body > div > p.notice");
+            if (notice) {
+                let referer = document.referrer;
+                if (!referer.includes("/users/sign_in?return_to=") && referer != homePage) {
+                    location.href = referer;
+                }
+            }
+
+        }
+    }
+
     if (document.querySelector("#browse-script-list")) {
         document.querySelector("#site-nav > nav > li.with-submenu").outerHTML = document.querySelector("#site-nav > nav > li.with-submenu > nav").innerHTML;
         addFilterSystem("#browse-script-list");
@@ -598,7 +629,11 @@
     if (location.href.includes("/feedback")) {
         if (document.querySelector(".script-discussion-list")) { addFilterSystem2(".script-discussion-list"); }
     }
-
+    //网址路径部分只有一个/则这个网址很大可能是主页地址，此方法兼容多语种的主页地址
+    if (location.pathname.indexOf('/', 3) == -1) {
+        redirection_for_login();
+        redirection_for_logout();
+    }
 
     // Your code here...
 })();
