@@ -449,12 +449,10 @@
     }
     function hideReplyByAuthor() {
         if (!document.querySelector("#user-discussions-on-scripts-written")) { return; }
-        let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
-        text = `最新：${text}作者`;
         let items = document.querySelectorAll("#user-discussions-on-scripts-written .discussion-list-container");
         let len = items.length;
         for (let i = 0; i < len; i++) {
-            if (items[i].innerText.includes(text)) { items[i].style.display = "none"; }
+            if (items[i].querySelector("div.discussion-meta-item div.discussion-meta-item span.badge.badge-author")) { items[i].style.display = "none"; }
         }
         let showAllBtn = document.createElement("input");
         showAllBtn.type = "button";
