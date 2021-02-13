@@ -5,7 +5,7 @@
 // @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.2.6
+// @version      0.2.7
 // @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -434,6 +434,19 @@
             p.appendChild(a8);
             p.appendChild(document.createTextNode(" | "));
             li.querySelector("article").appendChild(p);
+
+            //修改日期显示方式，网站自带显示方式为 几天前 加上具体日期显示
+            let gf_relative_time_list = li.querySelectorAll("gf-relative-time");
+            for (let i = 0; i < 2; i++) {
+                let node = gf_relative_time_list[i];
+                let text = node.innerText;
+                if (!/\d{2,4}\/\d{1,2}\/\d{1,2}/.test(text)) {
+                    let title = node.title.match(/\d{2,4}\/\d{1,2}\/\d{1,2}/);
+                    if (title) {
+                        node.innerText = node.innerText + `（${title[0]}）`;
+                    }
+                }
+            }
         }
     }
 
