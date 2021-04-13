@@ -1,30 +1,44 @@
 // ==UserScript==
-// @name         GreasyFork网站助手
-// @name:en      GreasyFork Helper
-// @namespace    https://github.com/kingphoenix2000/tampermonkey_scripts
-// @supportURL   https://github.com/kingphoenix2000/tampermonkey_scripts
-// @updateURL    https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version      0.2.7
-// @author       浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
-// @description  此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
-// @description:en  This script will add several shortcut buttons under each script on the script list page and user script list page of GreasyFork website. Including functions such as direct installation, temporary deletion, blacklisting, etc. Added a function to filter scripts based on keywords at the top of the script list.Author：浴火凤凰(QQ Number:307053741,QQ Group Number:194885662)
-// @homepage     https://blog.csdn.net/kingwolf_javascript/
-// @match        https://*greasyfork.org/*
-// @grant        GM_xmlhttpRequest
-// @connect      greasyfork.org
-// @grant        GM_getValue
-// @grant        GM_setValue
-// @note         2019-12-12 为脚本列表的每个脚本增加加入黑名单功能，加入黑名单的脚本会在页面加载完成以后被隐藏掉。可以单击显示全部脚本按钮来显示黑名单的脚本
-// @note         2020-01-08 在用户主页用户名的后面增加当前用户开发的脚本安装总数
-// @note         2020-04-07 修复某些脚本名称带有引号导致解析错误的问题
-// @note         2020-04-10 脚本架构重写。支持中英文界面。
-// @note         2020-04-15 增加 代码、历史版本、反馈、统计数据等快捷入口。增加宽窄屏幕切换功能。
-// @note         2020-04-16 增加 脚本列表综合排序功能，支持三个条件关联排序。
-// @note         2020-04-19 增加 在用户主页自动隐藏最后回复者是脚本作者的讨论，减少讨论内容，减轻脚本作者的心理负担。
-// @note         2020-05-24 增加 按照关键字列表隐藏脚本的功能。
-// @note         2020-06-04 由于GreasyFork网站改版，修改用户首页部分脚本代码，默认自动隐藏作者已经回复的讨论内容。
-// @note         2020-06-30 由于GreasyFork网站改版，修改脚本反馈部分脚本代码。
-// @note         2020-07-04 修复Bug。
+// @name                 GreasyFork网站助手
+// @name:zh-TW           GreasyFork网站助手
+// @name:en              GreasyFork Helper
+// @name:de              GreasyFork Helper
+// @name:fr              GreasyFork Helper
+// @name:ja              GreasyFork Helper
+// @name:ko              GreasyFork Helper
+// @name:ru              GreasyFork Helper
+// @name:sv              GreasyFork Helper
+// @namespace            https://github.com/kingphoenix2000/tampermonkey_scripts
+// @supportURL           https://github.com/kingphoenix2000/tampermonkey_scripts
+// @updateURL            https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
+// @version              0.2.8
+// @author               浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
+// @description          此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
+// @description:zh-TW    此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
+// @description:en       This script will add several shortcut buttons under each script item on the script list page and script author's home page of GreasyFork website. Including features such as direct installation, Temporarily hidden, blacklisting, and more exciting needs you to find out.  And  an input box was added at the top of the script list items,  So you can filter out your own scripts by keywords.Author：浴火凤凰(QQ Number:307053741,QQ Group Number:194885662)
+// @description:de       This script will add several shortcut buttons under each script item on the script list page and script author's home page of GreasyFork website. Including features such as direct installation, Temporarily hidden, blacklisting, and more exciting needs you to find out.  And  an input box was added at the top of the script list items,  So you can filter out your own scripts by keywords.Author：浴火凤凰(QQ Number:307053741,QQ Group Number:194885662)
+// @description:fr       This script will add several shortcut buttons under each script item on the script list page and script author's home page of GreasyFork website. Including features such as direct installation, Temporarily hidden, blacklisting, and more exciting needs you to find out.  And  an input box was added at the top of the script list items,  So you can filter out your own scripts by keywords.Author：浴火凤凰(QQ Number:307053741,QQ Group Number:194885662)
+// @description:ja       This script will add several shortcut buttons under each script item on the script list page and script author's home page of GreasyFork website. Including features such as direct installation, Temporarily hidden, blacklisting, and more exciting needs you to find out.  And  an input box was added at the top of the script list items,  So you can filter out your own scripts by keywords.Author：浴火凤凰(QQ Number:307053741,QQ Group Number:194885662)
+// @description:ko       This script will add several shortcut buttons under each script item on the script list page and script author's home page of GreasyFork website. Including features such as direct installation, Temporarily hidden, blacklisting, and more exciting needs you to find out.  And  an input box was added at the top of the script list items,  So you can filter out your own scripts by keywords.Author：浴火凤凰(QQ Number:307053741,QQ Group Number:194885662)
+// @description:ru       This script will add several shortcut buttons under each script item on the script list page and script author's home page of GreasyFork website. Including features such as direct installation, Temporarily hidden, blacklisting, and more exciting needs you to find out.  And  an input box was added at the top of the script list items,  So you can filter out your own scripts by keywords.Author：浴火凤凰(QQ Number:307053741,QQ Group Number:194885662)
+// @description:sv       This script will add several shortcut buttons under each script item on the script list page and script author's home page of GreasyFork website. Including features such as direct installation, Temporarily hidden, blacklisting, and more exciting needs you to find out.  And  an input box was added at the top of the script list items,  So you can filter out your own scripts by keywords.Author：浴火凤凰(QQ Number:307053741,QQ Group Number:194885662)
+// @homepage             https://blog.csdn.net/kingwolf_javascript/
+// @match                https://*greasyfork.org/*
+// @grant                GM_xmlhttpRequest
+// @connect              greasyfork.org
+// @grant                GM_getValue
+// @grant                GM_setValue
+// @note                 2019-12-12 为脚本列表的每个脚本增加加入黑名单功能，加入黑名单的脚本会在页面加载完成以后被隐藏掉。可以单击显示全部脚本按钮来显示黑名单的脚本
+// @note                 2020-01-08 在用户主页用户名的后面增加当前用户开发的脚本安装总数
+// @note                 2020-04-07 修复某些脚本名称带有引号导致解析错误的问题
+// @note                 2020-04-10 脚本架构重写。支持中英文界面。
+// @note                 2020-04-15 增加 代码、历史版本、反馈、统计数据等快捷入口。增加宽窄屏幕切换功能。
+// @note                 2020-04-16 增加 脚本列表综合排序功能，支持三个条件关联排序。
+// @note                 2020-04-19 增加 在用户主页自动隐藏最后回复者是脚本作者的讨论，减少讨论内容，减轻脚本作者的心理负担。
+// @note                 2020-05-24 增加 按照关键字列表隐藏脚本的功能。
+// @note                 2020-06-04 由于GreasyFork网站改版，修改用户首页部分脚本代码，默认自动隐藏作者已经回复的讨论内容。
+// @note                 2020-06-30 由于GreasyFork网站改版，修改脚本反馈部分脚本代码。
+// @note                 2020-07-04 修复Bug。
 // ==/UserScript==
 
 
