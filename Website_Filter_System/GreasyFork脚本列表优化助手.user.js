@@ -450,11 +450,11 @@
     }
 
     function total_installs() {
-        let items = document.querySelectorAll("#user-script-list article > dl > dd.script-list-total-installs > span");
+        let items = document.querySelectorAll("#user-script-list > li");
         let sum = 0;
         for (let i = 0; i < items.length; i++) {
-            let n = parseInt(items[i].innerText.replace(/,/g, ''), 10);
-            if (!isNaN(n)) { sum += n; }
+            let n = parseInt(items[i].dataset.scriptTotalInstalls, 10);
+            sum += n;
         }
         let text = document.querySelector("body > div.width-constraint > section > h2").innerText;
         document.querySelector("body > div.width-constraint > section > h2").innerText = text + `(${sum})`;
