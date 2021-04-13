@@ -5,7 +5,7 @@
 // @namespace             https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL            https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL             https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Page%20Automation/%E5%88%A0%E9%99%A4%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E5%90%91.user.js
-// @version               0.1.6
+// @version               0.1.7
 // @author                浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description           本脚本提供了一系列小工具，在您访问互联网网站的时候加快您访问网站的速度和提高您的工作效率。包括删除服务器重定向(支持全网网站)
 // @description:en        This script provides a series of small tools to speed up the speed of your visit to the website and improve your work efficiency.
@@ -26,7 +26,7 @@
 
     let div1 = document.createElement("div");
     div1.id = "returnToTop";
-    div1.innerText = "回到顶部";
+    div1.innerHTML = "回到顶部";
     div1.style.cssText = "display:none;font-size:15px;padding: 10px;bottom: 5px;right: 5px;z-index: 1000;background-color: gray;position: fixed;border-radius: 25px;text-align: center;cursor: pointer;color: #fff;";
     div1.onclick = function () { scrollTo(0, 0); }
     let height = document.documentElement.scrollHeight;
@@ -65,26 +65,27 @@
     function removeRedirectURL(msg, links) {
         let len1 = WebSite.Redirect_URL_List.length;
         for (let i = 0; i < links.length; i++) {
-            let href = links[i].href;
-            if (!href.startsWith("http://") && !href.startsWith("https://")) { continue; }
-            for (let j = 0; j < len1; j++) {
-                const url = WebSite.Redirect_URL_List[j];
-                //只删除 网址开头 是重定向URL的链接，并且只删除一个重定向URL
-                if (href.startsWith(url)) {
-                    href = href.replace(url, ''); break;
-                }
-            }
+            let href = links[i].getAttribute("href");
             if (href.startsWith("http")) {
-                try {
-                    href = decodeURIComponent(href);
-                    links[i].href = href;
+                for (let j = 0; j < len1; j++) {
+                    const url = WebSite.Redirect_URL_List[j];
+                    //只删除 网址开头 是重定向URL的链接，并且只删除一个重定向URL
+                    if (href.startsWith(url)) {
+                        href = href.replace(url, ''); break;
+                    }
                 }
-                catch (e) {
-                    console.log(`URL解码发生错误：${href}`);
+                if (href.startsWith("http")) {
+                    try {
+                        href = decodeURIComponent(href);
+                        links[i].href = href;
+                    }
+                    catch (e) {
+                        console.log(`URL解码发生错误：${href}`);
+                    }
                 }
-            }
-            else {
-                console.log("发现类似重定向，实际上不是重定向的网址： ", links[i].href);
+                else {
+                    console.log("发现类似重定向，实际上不是重定向的网址： ", links[i].href);
+                }
             }
         }
         num = num + links.length;
