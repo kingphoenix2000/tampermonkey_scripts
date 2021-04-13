@@ -89,7 +89,7 @@
             }
         }
         num = num + links.length;
-        console.log(msg, "目前已经删除重定向的链接数：", num);
+        // console.log(msg, "目前已经删除重定向的链接数：", num);
     }
     //首先删除已经加载的超链接的重定向
     removeRedirectURL("页面初始化阶段-->", document.links);
