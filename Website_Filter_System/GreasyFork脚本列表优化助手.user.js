@@ -11,7 +11,7 @@
 // @namespace            https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL           https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL            https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
-// @version              0.2.8
+// @version              0.2.9
 // @author               浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description          此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description:zh-TW    此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
@@ -28,6 +28,7 @@
 // @connect              greasyfork.org
 // @grant                GM_getValue
 // @grant                GM_setValue
+// @grant                GM_addStyle
 // @note                 2019-12-12 为脚本列表的每个脚本增加加入黑名单功能，加入黑名单的脚本会在页面加载完成以后被隐藏掉。可以单击显示全部脚本按钮来显示黑名单的脚本
 // @note                 2020-01-08 在用户主页用户名的后面增加当前用户开发的脚本安装总数
 // @note                 2020-04-07 修复某些脚本名称带有引号导致解析错误的问题
@@ -61,6 +62,7 @@
         container.appendChild(span);
     }
 
+    GM_addStyle('li > article > p.utiltools{visibility:hidden;}li:hover > article > p.utiltools{visibility:visible;}');
     let GUI_strs = {};
     let GUI_sort_Helper = {};
     let is_CN = location.href.includes("zh-");
@@ -363,6 +365,7 @@
         for (let i = 0; i < len; i++) {
             let li = node_lis[i];
             let p = document.createElement("p");
+            p.className = "utiltools";
 
             if (!li.querySelector("article > h2 > a")) { continue; }
             let dd = li.querySelector("article > dl > dd.script-list-ratings");
