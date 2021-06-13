@@ -4,7 +4,7 @@
 // @namespace             https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL            https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL             https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Page%20Automation/%E5%88%A0%E9%99%A4%E9%93%BE%E6%8E%A5%E9%87%8D%E5%AE%9A%E5%90%91.user.js
-// @version               0.1.7
+// @version               0.1.8
 // @author                浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description           本脚本提供了一系列小工具，在您访问互联网网站的时候加快您访问网站的速度和提高您的工作效率。包括删除服务器重定向(支持全网网站)
 // @description:en        This script provides a series of small tools to speed up the speed of your visit to the website and improve your work efficiency.
@@ -67,19 +67,30 @@
             if (href.startsWith("http")) {
                 for (let j = 0; j < len1; j++) {
                     const url = WebSite.Redirect_URL_List[j];
-                    //只删除 网址开头 是重定向URL的链接，并且只删除一个重定向URL
                     if (href.startsWith(url)) {
-                        href = href.replace(url, ''); break;
+                        href = href.replace(url, '');
+                        href = decodeURIComponent(href);
+                        break;
+                    }
+                }
+                for (let j = 0; j < len1; j++) {
+                    const url = WebSite.Redirect_URL_List[j];
+                    if (href.startsWith(url)) {
+                        href = href.replace(url, '');
+                        href = decodeURIComponent(href);
+                        break;
+                    }
+                }
+                for (let j = 0; j < len1; j++) {
+                    const url = WebSite.Redirect_URL_List[j];
+                    if (href.startsWith(url)) {
+                        href = href.replace(url, '');
+                        href = decodeURIComponent(href);
+                        break;
                     }
                 }
                 if (href.startsWith("http")) {
-                    try {
-                        href = decodeURIComponent(href);
-                        links[i].href = href;
-                    }
-                    catch (e) {
-                        console.log(`URL解码发生错误：${href}`);
-                    }
+                    links[i].href = href;
                 }
                 else {
                     console.log("发现类似重定向，实际上不是重定向的网址： ", links[i].href);
