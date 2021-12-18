@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name                 GreasyFork Helper
-// @name:zh              GreasyFork网站助手
+// @name:zh-CN           GreasyFork网站助手
+// @name:zh-TW           GreasyFork网站助手
 // @namespace            https://github.com/kingphoenix2000/tampermonkey_scripts
 // @supportURL           https://github.com/kingphoenix2000/tampermonkey_scripts
 // @updateURL            https://github.com/kingphoenix2000/tampermonkey_scripts/raw/master/Website_Filter_System/GreasyFork%E8%84%9A%E6%9C%AC%E5%88%97%E8%A1%A8%E4%BC%98%E5%8C%96%E5%8A%A9%E6%89%8B.user.js
 // @version              0.3.0
 // @author               浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @description          This script will add several shortcut buttons under each script item on the script list page and script author's home page of GreasyFork website. Including features such as direct installation, Temporarily hidden, blacklisting, and more exciting needs you to find out.  And  an input box was added at the top of the script list items,  So you can filter out your own scripts by keywords.Author：浴火凤凰(QQ Number:307053741,QQ Group Number:194885662)
-// @description:zh       此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
+// @description:zh-CN    此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
+// @description:zh-TW    此脚本会在GreasyFork网站的脚本列表页面和用户脚本列表页面每个脚本的下面添加几个快捷操作的按钮。包括直接安装、临时删除、加入黑名单等等功能。在脚本列表顶部添加了一个根据关键字过滤脚本的功能。作者：浴火凤凰(QQ:307053741,油猴脚本讨论QQ群:194885662)
 // @homepage             https://blog.csdn.net/kingwolf_javascript/
 // @match                https://*.greasyfork.org/*
 // @grant                GM_xmlhttpRequest
